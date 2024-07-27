@@ -1,0 +1,47 @@
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["postgreSqlExtensions"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  extensions = [pgcrypto]
+}
+
+model User {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  email String @unique
+  name String
+  password String
+  isAdmin Boolean @default(false)
+  usedSpace Int @default(0)
+  files File[]
+  folders Folder[]
+}
+
+model File {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  name String
+  type String
+  size Int
+  uploader User @relation(fields: [uploaderId], references: [id])
+  uploaderId String @db.Uuid
+  folder Folder? @relation(fields: [folderId], references: [id])
+  folderId String? @db.Uuid
+  @@unique([name, folderId])
+}
+
+model Folder {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  name String
+  owner User @relation(fields: [ownerId], references: [id])
+  ownerId String @db.Uuid
+  files File[]
+}
