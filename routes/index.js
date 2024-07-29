@@ -1,7 +1,8 @@
 const express = require('express');
 const prisma = require('../config/prisma');
 const {authenticate} = require('../middleware/authentication');
-const handleAsync = require('../middleware/asyncHandler');
+const handleAsync = require('../utils/asyncHandler');
+const util = require('util');
 
 const router = express.Router();
 
@@ -16,21 +17,19 @@ router.get('/', (req, res, next) => {
 router.post(
   '/login',
   handleAsync(async (req, res, next) => {
-    const user = await prisma.user.findUnique({where: {email: req.body.email}});
-    req.session.regenerate(err => {
-      if (err) {
-        next(err);
-      }
-      const {id, name, email} = user;
-      req.session.user = {id, name, email};
+    const regenerateSession = util.promisify(req.session.regenerate).bind(req.session);
+    const saveSession = util.promisify(req.session.save).bind(req.session);
 
-      req.session.save(err => {
-        if (err) {
-          next(err);
-        }
-        res.redirect('/');
-      });
-    });
+    const user = await prisma.user.findUnique({where: {email: req.body.email}});
+
+    await regenerateSession();
+
+    const {id, name, email} = user;
+    req.session.user = {id, name, email};
+
+    await saveSession();
+
+    res.redirect('/');
   })
 );
 
