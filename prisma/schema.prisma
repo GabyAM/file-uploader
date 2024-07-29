@@ -45,3 +45,10 @@ model Folder {
   ownerId String @db.Uuid
   files File[]
 }
+
+model Session {
+  id        String   @id
+  sid       String   @unique
+  data      String   
+  expiresAt   DateTime
+}
