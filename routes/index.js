@@ -1,6 +1,7 @@
 const express = require('express');
 const prisma = require('../config/prisma');
 const {authenticate} = require('../middleware/authentication');
+const handleAsync = require('../middleware/asyncHandler');
 
 const router = express.Router();
 
@@ -12,22 +13,25 @@ router.get('/', (req, res, next) => {
   res.render('login.ejs');
 });
 
-router.post('/login', async (req, res, next) => {
-  const user = await prisma.user.findUnique({where: {email: req.body.email}});
-  req.session.regenerate(err => {
-    if (err) {
-      next(err);
-    }
-    const {id, name, email} = user;
-    req.session.user = {id, name, email};
-
-    req.session.save(err => {
+router.post(
+  '/login',
+  handleAsync(async (req, res, next) => {
+    const user = await prisma.user.findUnique({where: {email: req.body.email}});
+    req.session.regenerate(err => {
       if (err) {
         next(err);
       }
-      res.redirect('/');
+      const {id, name, email} = user;
+      req.session.user = {id, name, email};
+
+      req.session.save(err => {
+        if (err) {
+          next(err);
+        }
+        res.redirect('/');
+      });
     });
-  });
-});
+  })
+);
 
 module.exports = router;
