@@ -2,19 +2,33 @@
   <head>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="/styles/layout.css" />
-    <link rel="stylesheet" href="/styles/login.css" />
-    <!-- more styles later -->
+    <link rel="stylesheet" href="/styles/authscreen.css" />
+    <link rel="stylesheet" href="/styles/form.css" />
   </head>
   <body>
-    <div class="login-background">
-      <div class="login-form-card form-card">
-        <h2>Login to start uploading files</h2>
+    <div class="auth-screen-background">
+      <div class="form-card">
+        <h2>Login to continue uploading files</h2>
         <form action="/login" method="POST">
           <fieldset>
-            <input placeholder="Email" type="text" name="email" id="email" />
-            <input placeholder="Password" type="password" name="password" id="password" />
+            <%- include('form_input.ejs', 
+            {
+              value: locals.values && values.email ? values.email : '', 
+              error: locals.errors && errors.email ? errors.email.msg : '',
+              type: 'text',
+              name: 'email',
+              label: 'Email'
+            }) %>
+            <%- include('form_input.ejs', 
+            {
+              value: locals.values && values.password ? values.password : '', 
+              error: locals.errors && errors.password ? errors.password.msg : '',
+              type: 'password',
+              name: 'password',
+              label: 'Password'
+            }) %>
           </fieldset>
-          <button>Send</button>
+          <button class="main-button">Send</button>
         </form>
       </div>
     </div>

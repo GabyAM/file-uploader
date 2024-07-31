@@ -1,0 +1,13 @@
+.auth-screen-background {
+  background-image: url('../images/login_background.png');
+  background-size: cover;
+  width: 100%;
+  z-index: 1;
+}
+.auth-screen-background::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(228, 227, 255, 0.1);
+}
