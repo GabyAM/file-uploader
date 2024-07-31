@@ -10,6 +10,13 @@ exports.getLoginPage = [
   },
 ];
 
+exports.getSignupPage = [
+  authenticate({successRedirect: '/'}),
+  (req, res, next) => {
+    res.render('signup.ejs');
+  },
+];
+
 exports.postLogin = [
   handleAsync(async (req, res, next) => {
     const regenerateSession = util.promisify(req.session.regenerate).bind(req.session);
@@ -23,5 +30,13 @@ exports.postLogin = [
     await saveSession();
 
     res.redirect('/');
+  }),
+];
+
+exports.postSignup = [
+  handleAsync(async (req, res, next) => {
+    const {name, email, password} = req.body;
+    await prisma.user.create({data: {name, email, password}});
+    res.redirect('/login');
   }),
 ];
