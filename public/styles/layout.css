@@ -1,0 +1,21 @@
+body {
+  display: flex;
+  flex-direction: row;
+}
+
+nav {
+  background-color: #262632;
+  width: 25%;
+  height: 100%;
+}
+nav .actions-section {
+  height: 100px;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 1.2rem 2rem;
+}
+
