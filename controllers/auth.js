@@ -2,6 +2,8 @@ const {body, validationResult} = require('express-validator');
 const prisma = require('../config/prisma');
 const {authenticate} = require('../middleware/authentication');
 const handleAsync = require('../utils/asyncHandler');
+const util = require('util');
+const validate = require('../middleware/validation');
 
 exports.getLoginPage = [
   authenticate({successRedirect: '/'}),
@@ -30,7 +32,12 @@ exports.postLogin = [
     .bail()
     .withMessage('Email format is incorrect')
     .custom(async (value, {req}) => {
-      const user = await prisma.user.findUnique({where: {email: value}});
+      let user;
+      try {
+        user = await prisma.user.findUniqueOrThrow({where: {email: value}});
+      } catch (e) {
+        throw new Error('EXTERNAL_ERROR: Error while validating email');
+      }
       if (!user) {
         throw new Error('User not found');
       }
@@ -51,10 +58,12 @@ exports.postLogin = [
       }
       return true;
     }),
+  validate,
   handleAsync(async (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.render('login.ejs', {errors: errors.mapped(), values: req.body});
+    if (req.validationResult) {
+      const {internalError, validationErrors} = req.validationResult;
+      const errorProps = {serverError: internalError, errors: validationErrors};
+      return res.render('login.ejs', {values: req.body, ...errorProps});
     }
     const regenerateSession = util.promisify(req.session.regenerate).bind(req.session);
     const saveSession = util.promisify(req.session.save).bind(req.session);
@@ -92,9 +101,14 @@ exports.postSignup = [
     .bail()
     .withMessage('Email format is incorrect')
     .custom(async (value, {req}) => {
-      const user = await prisma.user.findUnique({where: {email: value}});
-      if (!user) {
-        throw new Error('User not found');
+      let user;
+      try {
+        user = await prisma.user.findUnique({where: {email: value}});
+      } catch (e) {
+        throw new Error('EXTERNAL_ERROR: Error while validation email');
+      }
+      if (user) {
+        throw new Error('Email is already in use');
       }
       req.user = user;
     })
@@ -119,10 +133,12 @@ exports.postSignup = [
       }
       return true;
     }),
+  validate,
   handleAsync(async (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.render('signup.ejs', {values: req.body, errors: errors.mapped()});
+    if (req.validationResult) {
+      const {internalError, validationErrors} = req.validationResult;
+      const errorProps = {serverError: internalError, erros: validationErrors};
+      return res.render('signup.ejs', {values: req.body, ...errorProps});
     }
     const {name, email, password} = req.body;
     await prisma.user.create({data: {name, email, password}});
