@@ -29,6 +29,7 @@ model File {
   name String
   type String
   size Int
+  url String
   uploader User @relation(fields: [uploaderId], references: [id])
   uploaderId String @db.Uuid
   folder Folder? @relation(fields: [folderId], references: [id])

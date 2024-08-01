@@ -30,7 +30,11 @@ app.use(
 );
 
 const indexRouter = require('./routes/index');
+const fileRouter = require('./routes/file');
+
 app.use('/', indexRouter);
+app.use('/file', fileRouter);
+
 app.use((err, req, res, next) => {
   console.log(err);
   res.status(err.statusCode || 500).send(err.message);

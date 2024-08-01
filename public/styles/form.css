@@ -58,11 +58,11 @@
   flex-direction: column;
   gap: 0.25rem;
 }
-.input-container.error input {
+.input-container.error .input {
   border: 2px solid #ff5b5b;
 }
 
-.form-card form input {
+.form-card form .input {
   padding: 0.75rem 0.5rem;
   background: linear-gradient(to bottom, #262632, #383748 200%);
   border: none;
@@ -70,17 +70,17 @@
   color: white;
   width: 100%;
 }
-.form-card form input:focus {
+.form-card form .input:focus {
   outline: 2px solid #c6c5f3;
 }
-.form-card form input::placeholder {
+.form-card form .input::placeholder {
   color: white;
 }
 
 .form-card form .password-container .input-wrapper {
   position: relative;
 }
-.form-card form .password-container input {
+.form-card form .password-container .input {
   padding-right: 3rem;
 }
 .password-container button {
@@ -107,4 +107,11 @@
   width: fit-content;
   margin: 0 auto;
   padding: 0.25em 1em;
+}
+
+.form-card .input-container input[type='file'] {
+  display: none;
+}
+.form-card .input-container select > option {
+  background-color: #262632;
 }

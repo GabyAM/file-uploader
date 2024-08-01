@@ -1,0 +1,7 @@
+.error-label {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.25rem;
+  color: #ff5b5b;
+}

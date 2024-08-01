@@ -2,7 +2,11 @@
 <%- include('password_input.ejs') %>
 <% } else { %>
 <div class="input-container <%= locals.error ? 'error' : '' %>">
+  <% if(locals.type === 'file') { %>
+  <label class="input" for="<%= locals.name %>"><%= locals.label %></label>
+  <% } %>
   <input
+    class="input"
     placeholder="<%- locals.label %>"
     type="<%- locals.type %>"
     name="<%- locals.name %>"
@@ -29,5 +33,14 @@
         inputParent.removeChild(errorLabel);
       }
     });
+
+    if ('<%=locals.type%>' === 'file') {
+      input.addEventListener('change', e => {
+        if (e.target.files && e.target.files[0]) {
+          const label = input.labels[0];
+          label.textContent = e.target.files[0].name;
+        }
+      });
+    }
   })();
 </script>

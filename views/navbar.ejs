@@ -4,3 +4,14 @@
     <button id="show-folder-form-button">Create folder</button>
   </div>
 </nav>
+<%- include('file_form', {folders: locals.folders, errors: locals.fileErrors ? fileErrors : null, serverError: locals.fileFormError ? fileFormError : false}) %>
+<script>
+  const isFileFormOpen = '<%=locals.fileFormOpen%>' === 'true';
+  const fileForm = document.querySelector('.file-upload-form').parentElement.parentElement;
+  fileForm.style.display = isFileFormOpen ? 'block' : 'none';
+  document.querySelector('#show-file-form-button').addEventListener('click', () => {
+    fileForm.querySelector('form').reset();
+    fileForm.style.display = 'block';
+  });
+  });
+</script>
