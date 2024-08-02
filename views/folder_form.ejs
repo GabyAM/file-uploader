@@ -1,0 +1,9 @@
+<%- include('modal_form.ejs', {
+    name: 'folder-form',
+    action: '/folder/', 
+    enctype: 'application/x-www-form-urlencoded',
+    title: 'Add new folder',
+    formInputs: [{type: 'text', name: 'name', label: 'Name' }],
+    errors: locals.errors || null,
+    values: locals.values || null
+}) %>

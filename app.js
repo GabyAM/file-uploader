@@ -30,9 +30,11 @@ app.use(
 );
 
 const indexRouter = require('./routes/index');
+const folderRouter = require('./routes/folder');
 const fileRouter = require('./routes/file');
 
 app.use('/', indexRouter);
+app.use('/folder', folderRouter);
 app.use('/file', fileRouter);
 
 app.use((err, req, res, next) => {

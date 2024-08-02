@@ -5,13 +5,22 @@
   </div>
 </nav>
 <%- include('file_form', {folders: locals.folders, errors: locals.fileErrors ? fileErrors : null, serverError: locals.fileFormError ? fileFormError : false}) %>
+<%- include('folder_form.ejs', 
+{errors: locals.folderErrors ? folderErrors : null, 
+serverError: locals.folderFormError ? folderFormError : false}) %>
 <script>
   const isFileFormOpen = '<%=locals.fileFormOpen%>' === 'true';
+  const isFolderFormOpen = '<%=locals.folderFormOpen%>' === 'true';
   const fileForm = document.querySelector('.file-upload-form').parentElement.parentElement;
+  const folderForm = document.querySelector('.folder-form').parentElement.parentElement;
   fileForm.style.display = isFileFormOpen ? 'block' : 'none';
+  folderForm.style.display = isFolderFormOpen ? 'block' : 'none';
   document.querySelector('#show-file-form-button').addEventListener('click', () => {
     fileForm.querySelector('form').reset();
     fileForm.style.display = 'block';
   });
+  document.querySelector('#show-folder-form-button').addEventListener('click', () => {
+    folderForm.querySelector('form').reset();
+    folderForm.style.display = 'block';
   });
 </script>

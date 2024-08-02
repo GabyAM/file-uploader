@@ -1,0 +1,38 @@
+<div class="form-background">
+  <div class="form-card-wrapper">
+    <div class="<%= name %> form-card">
+      <button class="close-button">
+        <%- include('./icons/chevron.ejs') %>
+        <span>Back</span>
+      </button>
+      <form method="POST" action="<%= locals.action %>" enctype="<%= locals.enctype %>">
+        <h2><%= locals.title %></h2>
+        <fieldset>
+          <% formInputs.forEach(input => { %>
+          <% if(input.type === 'select') {%>
+          <%- include('form_select.ejs', 
+          {...input, 
+          error: locals.errors && errors[input.name] ? errors[input.name].msg : '',
+          value: locals.values && values[input.name] ? values[input.name] : '' }) %>
+          <% } else { %>
+          <%- include('form_input.ejs', 
+          {...input, 
+          error: locals.errors && errors[input.name] ? errors[input.name].msg : '',
+          value: locals.values && values[input.name] ? values[input.name] : ''}) %>
+          <% } %>
+          <% }) %>
+        </fieldset>
+        <button class="main-button">Upload</button>
+        <% if(locals.serverError) { %>
+        <%- include('error_label.ejs', {message: serverError}) %>
+        <% } %>
+      </form>
+    </div>
+  </div>
+</div>
+<script>
+  document.querySelector('.form-card.<%= name %> .close-button').addEventListener('click', () => {
+    document.querySelector('.form-card.<%= name %>').parentElement.parentElement.style.display =
+      'none';
+  });
+</script>
