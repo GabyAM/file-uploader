@@ -3,6 +3,19 @@
     <button id="show-file-form-button">Upload a file</button>
     <button id="show-folder-form-button">Create folder</button>
   </div>
+  <h2>Your space</h2>
+  <div>
+    <ul>
+      <% folders.forEach(folder => { %>
+      <a
+        class="<%= locals.selectedFolder && selectedFolder === folder.id ? 'selected' : '' %>"
+        href="/folder/<%= folder.id %>"
+      >
+        <li><%= folder.name %></li>
+      </a>
+      <% }) %>
+    </ul>
+  </div>
 </nav>
 <%- include('file_form', {folders: locals.folders, errors: locals.fileErrors ? fileErrors : null, serverError: locals.fileFormError ? fileFormError : false}) %>
 <%- include('folder_form.ejs', 
