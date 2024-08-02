@@ -20,6 +20,34 @@ const renameFolder = async (value, {req}) => {
   return newName;
 };
 
+exports.getFolderPage = [
+  authenticate({failureRedirect: '/'}),
+  param('id').custom(async (value, {req}) => {
+    let folder;
+    try {
+      folder = await prisma.folder.findUnique({where: {id: value}});
+    } catch (e) {
+      throw new Error('EXTERNAL_ERROR: Error while validating folder id');
+    }
+    if (!folder) {
+      throw new Error('Folder not found');
+    }
+    req.folder = folder;
+  }),
+  validate,
+  handleAsync(async (req, res, next) => {
+    if (req.validationResult) {
+      res.redirect('/');
+    }
+    const layoutProps = {
+      folders: await prisma.folder.findMany({where: {ownerId: req.session.user.id}}),
+      user: req.session.user,
+    };
+    const files = await prisma.file.findMany({where: {folderId: req.params.id}});
+    res.render('folder.ejs', {...layoutProps, folder: req.folder, files});
+  }),
+];
+
 exports.postFolderCreate = [
   authenticate({failureRedirect: '/login'}),
   body('name')
@@ -49,6 +77,6 @@ exports.postFolderCreate = [
     const folder = await prisma.folder.create({
       data: {ownerId: req.session.user.id, name: req.body.name},
     });
-    res.redirect(`/`);
+    res.redirect(`/folder/${folder.id}`);
   }),
 ];

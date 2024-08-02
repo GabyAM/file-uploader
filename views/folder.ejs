@@ -1,0 +1,13 @@
+<% let content = `
+<h2>Your space / ${ folder.name } </h2>
+<div class="folder-files">` %>
+<% files.forEach(file => { %>
+    <% content += include('file_preview.ejs', {name: file.name}) %>
+<% }) %>
+<% content += '</div>' %>
+
+<% let styles = `
+    <link rel="stylesheet" href="/styles/folder.css">
+` 
+%>
+<%- include('layout.ejs', {styles, content, selectedFolder: folder.id}) %>
