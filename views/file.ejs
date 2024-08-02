@@ -1,0 +1,19 @@
+<% let content = `
+<h2>Your space / ${ file.folder ? file.folder.name : '' } </h2>
+<div class="file-detail">` %>
+<% content += include('file_preview.ejs')%>      
+<% content += `
+<div class="file-info">
+    <h3>${file.name}</h3>
+    <div class="file-info-details">
+        <div><span><b>${file.type}</b></span> • <span><b>${file.size}</b></span></div>
+        <span class="grey"><b>Created at:</b> ${file.createdAt}</span>
+        <span class="grey"><b>Last updated at:</b> ${file.updatedAt}</span>
+    </div>
+` %>
+
+<% let styles = `
+    <link rel="stylesheet" href="/styles/file.css">
+` 
+%>
+<%- include('layout.ejs', {styles, content, selectedFolder: file.folderId}) %>

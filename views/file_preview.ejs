@@ -1,4 +1,13 @@
-<div class="file">
-  <div class="file-icon"><%- include('./icons/file.ejs') %></div>
-  <span><%= name %></span>
+<link rel="stylesheet" href="/styles/filepreview.css" />
+<% if(locals.redirects) { %>
+  <a class="file" href='<%= locals.url %>'> 
+<% } %>
+<div class="<%=!locals.redirects ? 'file' : ''%>">
+<div class="file-icon"><%- include('./icons/file.ejs') %></div>
+<% if(locals.name) { %>
+<span><%= name %></span>
+<% } %>
 </div>
+<% if(locals.redirects) { %>
+  </a> 
+<% } %>

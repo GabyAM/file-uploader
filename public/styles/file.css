@@ -1,0 +1,27 @@
+.file-detail {
+  display: flex;
+  flex-direction: row;
+  gap: 3em;
+  padding: 2rem;
+}
+.file-detail .file {
+  width: 150px;
+}
+
+.file-detail .file-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8em;
+}
+.file-detail .file-info-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4em;
+}
+
+.file-info-details span.grey {
+  color: #c6c6c6;
+}
+.file-info-details span.grey > * {
+  color: white;
+}

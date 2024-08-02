@@ -5,10 +5,17 @@
     <link rel="stylesheet" href="/styles/index.css" />
     <link rel="stylesheet" href="/styles/layout.css" />
     <link rel="stylesheet" href="/styles/form.css" />
+    <% if(locals.styles) { %>
+    <%- styles %>
+    <% } %>
   </head>
   <body>
     <%- include('navbar.ejs') %>
     <main>
+      <%- include('header.ejs') %>
+      <% if(locals.content) { %>
+      <%- content %>
+      <% } %>
     </main>
   </body>
 </html>

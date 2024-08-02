@@ -2,7 +2,7 @@
 <h2>Your space / ${ folder.name } </h2>
 <div class="folder-files">` %>
 <% files.forEach(file => { %>
-    <% content += include('file_preview.ejs', {name: file.name}) %>
+    <% content += include('file_preview.ejs', {name: file.name, redirects: true, url: `/file/${file.id}` }) %>
 <% }) %>
 <% content += '</div>' %>
 

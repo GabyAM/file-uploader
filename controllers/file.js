@@ -7,6 +7,7 @@ const {decode} = require('base64-arraybuffer');
 const path = require('path');
 const handleAsync = require('../utils/asyncHandler');
 const validate = require('../middleware/validation');
+const formatSize = require('../utils/sizeFormatter');
 
 const checkFileNameUniqueness = async (value, {req}) => {
   if (value === '') return true;
@@ -31,13 +32,13 @@ const checkFileNameUniqueness = async (value, {req}) => {
   return true;
 };
 
-const renameUntitledFile = async (value, {req}) => {
-  if (value !== '') return value;
+const renameFile = async (value, {req}) => {
+  let newName = value || 'Untitled';
   try {
     let untitledFiles;
     if (req.folder) {
       untitledFiles = await prisma.file.findMany({
-        where: {folderId: req.folder.id, name: {startsWith: 'Untitled'}},
+        where: {folderId: req.folder.id, name: {startsWith: newName}},
       });
     } else {
       const userId = req.session.user.id;
@@ -45,12 +46,11 @@ const renameUntitledFile = async (value, {req}) => {
         where: {
           uploaderId: userId,
           folderId: null,
-          name: {startsWith: 'Untitled'},
+          name: {startsWith: newName},
         },
       });
     }
-    let newName = 'Untitled';
-    if (untitledFiles) {
+    if (untitledFiles.length > 0) {
       newName += ` (${untitledFiles.length + 1})`;
     }
     return newName;
@@ -58,6 +58,31 @@ const renameUntitledFile = async (value, {req}) => {
     throw new Error('EXTERNAL_ERROR: Unexpected error while sanitizing name');
   }
 };
+
+const formatFileDetails = file => {
+  file.size = formatSize(file.size);
+  file.createdAt = file.createdAt.toLocaleDateString() + ' ' + file.createdAt.toLocaleTimeString();
+  file.updatedAt = file.updatedAt.toLocaleDateString() + ' ' + file.updatedAt.toLocaleTimeString();
+};
+
+exports.getFilePage = [
+  authenticate({failureRedirect: '/login'}),
+  handleAsync(async (req, res, next) => {
+    const file = await prisma.file.findUnique({
+      where: {id: req.params.id},
+    });
+    formatFileDetails(file);
+    const folders = await prisma.folder.findMany({where: {ownerId: req.session.user.id}});
+    if (file.folderId) {
+      file.folder = folders.find(f => f.id === file.folderId);
+    }
+    const layoutProps = {
+      folders,
+      user: req.session.user,
+    };
+    res.render('file.ejs', {...layoutProps, file});
+  }),
+];
 
 exports.postUploadFile = [
   authenticate({failureRedirect: '/login'}),
@@ -95,7 +120,12 @@ exports.postUploadFile = [
       req.folder = folder;
       return true;
     }),
-  body('name').custom(checkFileNameUniqueness).bail().customSanitizer(renameUntitledFile),
+  body('name')
+    .default('')
+    .isString()
+    .withMessage('Name has to be a string')
+    .bail()
+    .customSanitizer(renameFile),
   validate,
   handleAsync(async (req, res, next) => {
     if (req.validationResult) {
@@ -135,6 +165,8 @@ exports.postUploadFile = [
         data: {usedSpace: {increment: req.file.size}},
       }),
     ]);
-    res.redirect('/');
+    if (req.folder) {
+      res.redirect('/folder/' + req.folder.id);
+    } else res.redirect('/');
   }),
 ];
