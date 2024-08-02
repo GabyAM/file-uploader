@@ -1,20 +1,30 @@
 <nav>
   <div class="actions-section">
-    <button id="show-file-form-button">Upload a file</button>
-    <button id="show-folder-form-button">Create folder</button>
+    <button id="show-file-form-button">
+      <%- include('./icons/file_upload.ejs', {size: '1.5em'}) %>
+      <span>Upload file</span>
+    </button>
+    <button id="show-folder-form-button">
+      <%- include('./icons/folder_create.ejs', {size: '1.5em'}) %>
+      <span>Add folder</span>
+    </button>
   </div>
-  <h2>Your space</h2>
-  <div>
-    <ul>
-      <% folders.forEach(folder => { %>
-      <a
-        class="<%= locals.selectedFolder && selectedFolder === folder.id ? 'selected' : '' %>"
-        href="/folder/<%= folder.id %>"
-      >
-        <li><%= folder.name %></li>
-      </a>
-      <% }) %>
-    </ul>
+  <div class="folders-section">
+    <h2>Your space</h2>
+    <div>
+      <ul class="folders-list">
+        <% folders.forEach(folder => { %>
+        <a href="/folder/<%= folder.id %>">
+          <li
+            class="<%= locals.selectedFolder && selectedFolder === folder.id ? 'selected' : '' %>"
+          >
+            <%- include('./icons/folder.ejs', {size: '1.75em'}) %>
+            <span><%= folder.name %></span>
+          </li>
+        </a>
+        <% }) %>
+      </ul>
+    </div>
   </div>
 </nav>
 <%- include('file_form', {folders: locals.folders, errors: locals.fileErrors ? fileErrors : null, serverError: locals.fileFormError ? fileFormError : false}) %>
