@@ -142,11 +142,12 @@ exports.postUploadFile = [
         rootFiles: await prisma.file.findMany({
           where: {uploaderId: req.session.user.id, folderId: null},
         }),
+        isRoot: true,
         folders: await prisma.folder.findMany({where: {ownerId: req.session.user.id}}),
         user: req.session.user,
       };
 
-      return res.render('layout.ejs', {
+      return res.render('folder.ejs', {
         ...layoutProps,
         ...props,
       });

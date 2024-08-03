@@ -1,10 +1,10 @@
-.file {
+.item {
   text-align: center;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 }
-.file-icon {
+.item-icon {
   border-radius: 0.8rem;
   aspect-ratio: 1/1;
   padding: 2em;
@@ -14,11 +14,11 @@
   background-color: rgba(198, 197, 243, 0.09);
   color: #e4e3ff;
 }
-div:not(.file-detail) > .file .file-icon:hover {
+div:not(.file-detail) > .item .item-icon:hover {
   background-color: rgba(198, 197, 243, 0.12);
 }
 
-.file-icon svg {
+.item-icon svg {
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;

@@ -1,8 +1,16 @@
+<% let folderFiles = locals.isRoot ? locals.rootFiles : locals.files %> 
 <% let content = `
-<h2>Your space / ${ folder.name } </h2>
+<h2>Your space / ${ locals.isRoot ? '' : folder.name  }</h2>
 <div class="folder-files">` %>
-<% files.forEach(file => { %>
-    <% content += include('file_preview.ejs', {name: file.name, redirects: true, url: `/file/${file.id}` }) %>
+<% if(locals.isRoot) { %>
+  <% folders.forEach(folder => { %>
+    <% content += include('item_preview.ejs', 
+    {name: folder.name, icon: 'folder', redirects: true, url: `/folder/${folder.id}` }) %>
+  <% }) %>
+<% } %>
+<% folderFiles.forEach(file => { %>
+    <% content += include('item_preview.ejs', 
+    {name: file.name, icon: 'file', redirects: true, url: `/file/${file.id}` }) %>
 <% }) %>
 <% content += '</div>' %>
 
@@ -10,4 +18,4 @@
     <link rel="stylesheet" href="/styles/folder.css">
 ` 
 %>
-<%- include('layout.ejs', {styles, content, selectedFolder: folder.id}) %>
+<%- include('layout.ejs', {styles, content, selectedFolder: locals.folder ? folder.id : null}) %>

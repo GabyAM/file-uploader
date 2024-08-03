@@ -9,6 +9,6 @@ exports.getHomePage = [
     const rootFiles = await prisma.file.findMany({
       where: {uploaderId: req.session.user.id, folderId: null},
     });
-    res.render('layout.ejs', {user: req.session.user, folders, rootFiles});
+    res.render('folder.ejs', {user: req.session.user, folders, isRoot: true, rootFiles});
   }),
 ];

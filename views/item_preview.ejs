@@ -1,0 +1,13 @@
+<link rel="stylesheet" href="/styles/itempreview.css" />
+<% if(locals.redirects) { %>
+  <a class="item" href='<%= locals.url %>'> 
+<% } %>
+<div class="<%=!locals.redirects ? 'item' : ''%>">
+<div class="item-icon"><%- include(`./icons/${locals.icon}.ejs`, {size: '100%'}) %></div>
+<% if(locals.name) { %>
+<span><%= name %></span>
+<% } %>
+</div>
+<% if(locals.redirects) { %>
+  </a> 
+<% } %>
