@@ -40,15 +40,15 @@ nav button svg {
   color: #e4e3ff;
 }
 
-nav .folders-section h2 {
+nav .items-section h2 {
   padding: 0 1.2em;
   font-size: 1.25em;
 }
-nav .folders-section .folders-list {
+nav .folders-section .items-list {
   list-style: none;
   padding: 1em 0;
 }
-.folders-list li {
+.items-list li {
   padding: 0.4em 2.25em;
   display: flex;
   flex-direction: row;
@@ -56,10 +56,10 @@ nav .folders-section .folders-list {
   gap: 0.8em;
   font-weight: 500;
 }
-.folders-list li svg {
+.items-list li svg {
   color: #e4e3ff;
 }
-.folders-list li.selected {
+.items-list li.selected {
   background-color: rgba(198, 197, 243, 0.09);
 }
 

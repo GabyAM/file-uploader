@@ -77,6 +77,9 @@ exports.getFilePage = [
       file.folder = folders.find(f => f.id === file.folderId);
     }
     const layoutProps = {
+      rootFiles: await prisma.file.findMany({
+        where: {uploaderId: req.session.user.id, folderId: null},
+      }),
       folders,
       user: req.session.user,
     };
@@ -130,14 +133,21 @@ exports.postUploadFile = [
   handleAsync(async (req, res, next) => {
     if (req.validationResult) {
       const {internalError, validationErrors} = req.validationResult;
-      const props = {fileFormError: internalError, fileErrors: validationErrors};
-
-      const folders = await prisma.folder.findMany();
+      const props = {
+        fileFormOpen: true,
+        fileFormError: internalError,
+        fileErrors: validationErrors,
+      };
+      const layoutProps = {
+        rootFiles: await prisma.file.findMany({
+          where: {uploaderId: req.session.user.id, folderId: null},
+        }),
+        folders: await prisma.folder.findMany({where: {ownerId: req.session.user.id}}),
+        user: req.session.user,
+      };
 
       return res.render('layout.ejs', {
-        folders,
-        user: req.session.user,
-        fileFormOpen: true,
+        ...layoutProps,
         ...props,
       });
     }

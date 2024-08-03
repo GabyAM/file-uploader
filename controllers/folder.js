@@ -40,6 +40,9 @@ exports.getFolderPage = [
       res.redirect('/');
     }
     const layoutProps = {
+      rootFiles: await prisma.file.findMany({
+        where: {uploaderId: req.session.user.id, folderId: null},
+      }),
       folders: await prisma.folder.findMany({where: {ownerId: req.session.user.id}}),
       user: req.session.user,
     };
@@ -65,6 +68,9 @@ exports.postFolderCreate = [
         folderFormOpen: true,
       };
       const layoutProps = {
+        rootFiles: await prisma.file.findMany({
+          where: {uploaderId: req.session.user.id, folderId: null},
+        }),
         folders: await prisma.folder.findMany({where: {ownerId: req.session.user.id}}),
         user: req.session.user,
       };

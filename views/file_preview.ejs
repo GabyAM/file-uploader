@@ -3,7 +3,7 @@
   <a class="file" href='<%= locals.url %>'> 
 <% } %>
 <div class="<%=!locals.redirects ? 'file' : ''%>">
-<div class="file-icon"><%- include('./icons/file.ejs') %></div>
+<div class="file-icon"><%- include('./icons/file.ejs', {size: '100%'}) %></div>
 <% if(locals.name) { %>
 <span><%= name %></span>
 <% } %>

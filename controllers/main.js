@@ -6,6 +6,9 @@ exports.getHomePage = [
   authenticate({failureRedirect: '/login'}),
   handleAsync(async (req, res, next) => {
     const folders = await prisma.folder.findMany({where: {ownerId: req.session.user.id}});
-    res.render('layout.ejs', {user: req.session.user, folders});
+    const rootFiles = await prisma.file.findMany({
+      where: {uploaderId: req.session.user.id, folderId: null},
+    });
+    res.render('layout.ejs', {user: req.session.user, folders, rootFiles});
   }),
 ];

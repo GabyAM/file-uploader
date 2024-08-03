@@ -9,10 +9,10 @@
       <span>Add folder</span>
     </button>
   </div>
-  <div class="folders-section">
+  <div class="items-section">
     <h2>Your space</h2>
     <div>
-      <ul class="folders-list">
+      <ul class="items-list">
         <% folders.forEach(folder => { %>
         <a href="/folder/<%= folder.id %>">
           <li
@@ -22,6 +22,16 @@
             <span><%= folder.name %></span>
           </li>
         </a>
+        <% }) %>
+        <% rootFiles.forEach(file => { %>
+          <a href="/file/<%= file.id %>">
+            <li 
+              class="<%= locals.selectedFile && selectedFile === file.id ? 'selected' : '' %>"
+            >
+              <%- include('./icons/file.ejs', {size: '1.75em'}) %>
+              <span><%= file.name %></span>
+            </li>
+          </a>
         <% }) %>
       </ul>
     </div>
