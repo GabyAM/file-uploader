@@ -4,6 +4,7 @@ const {authenticate} = require('../middleware/authentication');
 const handleAsync = require('../utils/asyncHandler');
 const util = require('util');
 const validate = require('../middleware/validation');
+const formatSize = require('../utils/sizeFormatter');
 
 exports.getLoginPage = [
   authenticate({successRedirect: '/'}),
@@ -70,8 +71,9 @@ exports.postLogin = [
 
     await regenerateSession();
 
-    const {id, name, email} = req.user;
-    req.session.user = {id, name, email};
+    const {id, name, email, usedSpace} = req.user;
+    const usedSpaceFormatted = formatSize(usedSpace);
+    req.session.user = {id, name, email, usedSpace, usedSpaceFormatted};
 
     await saveSession();
 

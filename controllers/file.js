@@ -96,12 +96,23 @@ exports.postUploadFile = [
       }
       next();
     }),
-  body('file').custom((value, {req}) => {
+  body('file').custom(async (value, {req}) => {
+    if (req.fileValidationError) {
+      throw new Error('File is too big');
+    }
     if (!req.file) {
       throw new Error('File is required');
     }
-    if (req.fileValidationError) {
-      throw new Error('File is too big');
+    let user;
+    try {
+      user = await prisma.user.findUnique({
+        where: {id: req.session.user.id},
+      });
+    } catch (e) {
+      throw new Error('EXTERNAL_ERROR: error while validating file');
+    }
+    if (req.file.size + user.usedSpace > 50 * 1024 * 1024) {
+      throw new Error('Cannot upload file, there is no enough space');
     }
     return true;
   }),
@@ -176,6 +187,8 @@ exports.postUploadFile = [
         data: {usedSpace: {increment: req.file.size}},
       }),
     ]);
+    req.session.user.usedSpace += req.file.size;
+    req.session.user.usedSpaceFormatted = formatSize(req.session.user.usedSpace);
     if (req.folder) {
       res.redirect('/folder/' + req.folder.id);
     } else res.redirect('/');

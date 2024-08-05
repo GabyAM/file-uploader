@@ -40,13 +40,17 @@ nav button svg {
   color: #e4e3ff;
 }
 
-nav .items-section h2 {
+nav section {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+nav section h2 {
   padding: 0 1.2em;
   font-size: 1.25em;
 }
-nav .folders-section .items-list {
+nav .items-section .items-list {
   list-style: none;
-  padding: 1em 0;
 }
 .items-list li {
   padding: 0.4em 2.25em;
@@ -62,7 +66,19 @@ nav .folders-section .items-list {
 .items-list li.selected {
   background-color: rgba(198, 197, 243, 0.09);
 }
-
+nav .storage-section {
+  padding-bottom: 3em;
+}
+nav .storage-bar-container {
+  padding: 0 2.25em;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25em;
+}
+nav .storage-space-bar {
+  height: 0.5rem;
+  border-radius: 100vh;
+}
 main {
   display: flex;
   flex-direction: column;

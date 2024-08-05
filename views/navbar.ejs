@@ -9,7 +9,7 @@
       <span>Add folder</span>
     </button>
   </div>
-  <div class="items-section">
+  <section class="items-section">
     <h2>Your space</h2>
     <div>
       <ul class="items-list">
@@ -35,7 +35,16 @@
         <% }) %>
       </ul>
     </div>
-  </div>
+  </section>
+  <section class="storage-section">
+    <h2>Storage</h2>
+    <div class="storage-bar-container">
+      <% if(user.usedSpaceFormatted) { %>
+        <span><%=user.usedSpaceFormatted %> of 50MB used</span>
+        <div class="storage-space-bar"></div>
+        <% } %>
+    </div>
+  </section>
 </nav>
 <%- include('file_form', {folders: locals.folders, errors: locals.fileErrors ? fileErrors : null, serverError: locals.fileFormError ? fileFormError : false}) %>
 <%- include('folder_form.ejs', 
@@ -56,4 +65,8 @@ serverError: locals.folderFormError ? folderFormError : false}) %>
     folderForm.querySelector('form').reset();
     folderForm.style.display = 'block';
   });
+
+  const storageBar = document.querySelector('.storage-space-bar');
+  const usedPercentage = ( Number("<%= locals.user.usedSpace %>") * 100) / 52428800;
+  storageBar.style.background = `linear-gradient(to right, #A09EFF ${usedPercentage}%, #1C1C25 ${usedPercentage}%)`
 </script>
