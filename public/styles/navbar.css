@@ -1,0 +1,103 @@
+nav {
+  background-color: #262632;
+  width: 25%;
+  max-width: 500px;
+  height: 100%;
+  position: sticky;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  flex-shrink: 0;
+  overflow-y: auto;
+  scrollbar-color: #1c1c25 rgba(198, 197, 243, 0.09);
+  scrollbar-width: thin;
+  transition: transform 0.5s ease;
+}
+nav.visible {
+  transform: translateX(0);
+}
+
+nav .menu-button-container {
+  padding: 1.2rem 2rem 0 2rem;
+  height: 3em;
+  display: none;
+}
+nav .expand-button {
+  display: none;
+}
+
+nav .actions-section {
+  padding: 0.8em 0.5em;
+  max-width: 500px;
+}
+
+nav section {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+nav section h2 {
+  padding: 0 1.2em;
+  font-size: 1.25em;
+}
+nav .items-section .items-list {
+  list-style: none;
+}
+.items-list li {
+  padding: 0.4em 2.25em;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.8em;
+  font-weight: 500;
+}
+.items-list li svg {
+  color: #e4e3ff;
+  flex-shrink: 0;
+}
+.items-list li span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.items-list li.selected {
+  background-color: rgba(198, 197, 243, 0.09);
+}
+nav .storage-section {
+  padding-bottom: 3em;
+}
+nav .storage-bar-container {
+  padding: 0 2.25em;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25em;
+}
+nav .storage-space-bar {
+  height: 0.5rem;
+  border-radius: 100vh;
+}
+
+@media (max-width: 800px) {
+  nav {
+    width: clamp(30%, 300px, 80%);
+    position: fixed;
+    transform: translateX(-100%);
+  }
+
+  nav .menu-button-container {
+    display: block;
+  }
+  nav .expand-button {
+    display: block;
+  }
+}
+
+@media (max-width: 475px) {
+  nav .actions-section {
+    display: none;
+  }
+}

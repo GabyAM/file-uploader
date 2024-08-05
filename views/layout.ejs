@@ -19,3 +19,49 @@
     </main>
   </body>
 </html>
+<script>
+  const navbar = document.querySelector('nav');
+  const expandButtons = document.querySelectorAll('.expand-button');
+
+  expandButtons.forEach(btn => btn.addEventListener('click', () => {
+    navbar.classList.toggle('visible')
+  }))
+  
+  function isNavbarButton(element) {
+    value = false;
+    expandButtons.forEach(btn => {
+      if(btn.contains(element)) {
+        value = true;
+      }
+    })
+    return value;
+  }
+
+  window.addEventListener('click', (e) => {
+    if(e.target !== navbar  
+      && !isNavbarButton(e.target)
+      && navbar.classList.contains('visible')) {
+        console.log(e.target)
+      navbar.classList.remove('visible')
+    }
+  })
+
+  const isFileFormOpen = '<%=locals.fileFormOpen%>' === 'true';
+  const isFolderFormOpen = '<%=locals.folderFormOpen%>' === 'true';
+  const fileForm = document.querySelector('.upload-file-form').parentElement.parentElement;
+  const folderForm = document.querySelector('.add-folder-form').parentElement.parentElement;
+  fileForm.style.display = isFileFormOpen ? 'block' : 'none';
+  folderForm.style.display = isFolderFormOpen ? 'block' : 'none';
+
+  const fileFormButtons = document.querySelectorAll('.show-file-form-button');
+  fileFormButtons.forEach(button => button.addEventListener('click', () => {
+    fileForm.querySelector('form').reset();
+    fileForm.style.display = 'block';
+  })) 
+
+  const addFolderButtons = document.querySelectorAll(".show-folder-form-button");
+  addFolderButtons.forEach(button => button.addEventListener('click', () => {
+    folderForm.querySelector('form').reset();
+    folderForm.style.display = 'block';
+  }))
+</script>
