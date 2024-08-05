@@ -8,6 +8,7 @@ const path = require('path');
 const handleAsync = require('../utils/asyncHandler');
 const validate = require('../middleware/validation');
 const formatSize = require('../utils/sizeFormatter');
+const renderIndex = require('../middleware/render');
 
 const checkFileNameUniqueness = async (value, {req}) => {
   if (value === '') return true;
@@ -149,19 +150,8 @@ exports.postUploadFile = [
         fileFormError: internalError,
         fileErrors: validationErrors,
       };
-      const layoutProps = {
-        rootFiles: await prisma.file.findMany({
-          where: {uploaderId: req.session.user.id, folderId: null},
-        }),
-        isRoot: true,
-        folders: await prisma.folder.findMany({where: {ownerId: req.session.user.id}}),
-        user: req.session.user,
-      };
 
-      return res.render('folder.ejs', {
-        ...layoutProps,
-        ...props,
-      });
+      return renderIndex(req, res, next, props);
     }
 
     const fileName = `${Date.now()}_${Math.round(Math.random() * 1e9)}${path.extname(req.file.originalname)}`;
