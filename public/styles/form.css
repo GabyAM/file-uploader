@@ -1,8 +1,9 @@
 .form-background {
-  position: absolute;
+  position: fixed;
   min-width: 100%;
   min-height: 100%;
   backdrop-filter: blur(2px);
+  display: none;
 }
 
 .form-card-wrapper {
@@ -21,7 +22,7 @@
   z-index: 2;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1rem;
   background-color: #1c1c25;
   max-width: min(400px, 80%);
   width: 100%;
@@ -34,9 +35,30 @@
   border: 1px solid #ff5b5b;
 }
 
+.form-card .close-button {
+  color: #a09eff;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: none;
+  border: none;
+  width: fit-content;
+  padding: 0.25em 0.5em;
+  border-radius: 0.5em;
+}
+.form-card .close-button:hover {
+  background-color: #262632;
+}
+
 .form-card h2 {
   font-size: 1.25em;
   font-weight: 500;
+}
+
+.form-card a {
+  color: #a09eff;
+  text-decoration: none;
+  font-weight: 700;
 }
 
 .form-card form {
@@ -99,14 +121,9 @@
 }
 
 .form-card .main-button {
-  background: linear-gradient(to bottom left, #e4e3ff, #c6c5f3);
-  border: none;
-  border-radius: 0.3rem;
-  font-size: 1.6em;
-  font-weight: 700;
-  width: fit-content;
-  margin: 0 auto;
   padding: 0.25em 1em;
+  font-size: 1.6em;
+  margin: 0 auto;
 }
 
 .form-card .input-container input[type='file'] {

@@ -18,6 +18,20 @@
       <% } %>
     </main>
   </body>
+  <%- include('folder_form.ejs', {
+    name: 'add-folder-form',  
+    title: 'Add a new folder', 
+    errors: locals.folderErrors ? folderErrors : null, 
+    serverError: locals.folderFormError ? folderFormError : false
+  }) %>
+  <%- include('file_form.ejs', {
+    name: 'upload-file-form', 
+    action: '/file/upload',
+    title: 'Upload a new file', 
+    folders: locals.folders, 
+    errors: locals.fileErrors ? fileErrors : null, 
+    serverError: locals.fileFormError ? fileFormError : false
+  }) %>
 </html>
 <script>
   const navbar = document.querySelector('nav');

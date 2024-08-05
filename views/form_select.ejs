@@ -5,10 +5,15 @@
       id="<%- locals.name %>"
       value="<%= locals.value ? value : '' %>"
     >
-    <option selected disabled hidden value=""><%=locals.label%></option>
+    <option disabled hidden value=""><%=locals.label%></option>
     <option value="">None</option>
     <% options.forEach(option => { %>
-        <option value="<%=option.id%>"><%=option.name%></option>
+      <option 
+        <%= option.id === locals.value ? 'selected' : '' %>  
+        id="<%=option.id%>" 
+        value="<%=option.id%>"
+      ><%=option.name%>
+      </option>
     <% }) %>
     </select>
     <% if(locals.error) { %>

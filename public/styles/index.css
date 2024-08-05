@@ -69,5 +69,15 @@ a {
   text-decoration: none;
   color: inherit;
 }
+
+.main-button {
+  background: linear-gradient(to bottom left, #e4e3ff, #c6c5f3);
+  border: none;
+  border-radius: 0.3rem;
   font-weight: 700;
+  width: fit-content;
+  height: fit-content;
+  padding: 0.4em 0.625em;
+  font-size: 1.125em;
+}
 }

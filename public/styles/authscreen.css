@@ -1,6 +1,7 @@
-.auth-screen-background {
+.auth-screen-background.form-background {
   background-image: url('../images/login_background.png');
   background-size: cover;
   width: 100%;
   z-index: 1;
+  display: block;
 }

@@ -1,37 +1,14 @@
-<div class="form-background">
-  <div class="form-card-wrapper">
-    <div class="file-upload-form form-card">
-      <form method="POST" action="/file/upload" enctype="multipart/form-data">
-        <h2>Upload new file</h2>
-        <fieldset>
-          <%- include('form_input.ejs',
-            {
-              type: 'file',
-              name: 'file',
-              label: 'Select a file',
-              error: locals.errors && errors.file ? errors.file.msg : ''
-            }) %>
-          <%- include('form_input.ejs',
-            {
-              value: '',
-              type: 'text',
-              name: 'name',
-              label: 'Name',
-              error: locals.errors && errors.name ? errors.name.msg : ''
-            }) %>
-          <%- include('form_select.ejs',
-            {
-              options: locals.folders,
-              name: 'folder',
-              label: 'Select a folder',
-              error: locals.errors && errors.folder ? errors.folder.msg : ''
-            }) %>
-        </fieldset>
-        <button class="main-button">Upload</button>
-        <% if(locals.serverError) { %>
-        <%- include('error_label.ejs', {message: 'There was an error uploading the file'}) %>
-        <% } %>
-      </form>
-    </div>
-  </div>
-</div>
+<%- include('modal_form.ejs', 
+{
+  name: locals.name,
+  action: locals.action, 
+  enctype: 'multipart/form-data',
+  title: locals.title,
+  formInputs: [
+    {type: 'file', name: 'file', label: 'Select a file'},
+    {type: 'text', name: 'name', label: 'Name'},
+    {type: 'select', options: locals.folders, name: 'folder', label: 'Select a folder'}
+  ], 
+  errors: locals.errors || null,
+  values: locals.values || null
+}) %>
