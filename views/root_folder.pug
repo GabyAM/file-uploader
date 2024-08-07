@@ -1,0 +1,22 @@
+extends layout
+block content
+  - let hasContent = rootFiles?.length || folders?.length;
+  if user
+    .heading-section
+      h2
+        a(href='/') Your space /
+    if hasContent
+      .folder-files
+        include item_preview.pug
+        if folders
+          each folder in folders
+            +itemPreview({name: folder.name, icon: 'folder', redirects: true, url: `/folder/${folder.id}` }) 
+        if rootFiles
+          each file in rootFiles 
+            +itemPreview({name: file.name, icon: 'file', redirects: true, url: `/file/${file.id}` })
+    else
+      .no-content-message
+        p There are no files or folders yet. #[button.bare-button.show-file-form-button Start uploading now!]
+
+block append styles
+  link(rel='stylesheet', href='/styles/folder.css')

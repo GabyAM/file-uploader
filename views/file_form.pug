@@ -1,0 +1,21 @@
+mixin fileForm({name, action, title, folders, values, errors})
+  include modal_form.pug
+  -
+    let args = { 
+      name: name, 
+      action: action, 
+      enctype: 'multipart/form-data', 
+      title: title, 
+      formInputs: [ 
+        {type: 'file', name: 'file', label: 'Select a file'}, 
+        {type: 'text', name: 'name', label: 'Name'}, 
+        {
+          type: 'select', 
+          options: [{id: '', name: 'None'}, ...folders], 
+          name: 'folder', 
+          label: values && values.folder ? null : 'Select a folder'
+        }
+      ], 
+      errors: errors || null, values: values || null
+    }
+  +modalForm(args)

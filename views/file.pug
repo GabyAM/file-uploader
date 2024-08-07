@@ -1,0 +1,70 @@
+extends layout
+block content
+  .heading-section
+    h2 Your space / #{file.folder ? file.folder.name : ''}
+  .file-detail
+    include item_preview.pug
+    +itemPreview({icon: 'file'}) 
+    .file-info
+      h3= file.name
+      .file-info-details
+        div
+          span
+            b= file.type
+          |
+          | •
+          span
+            b= file.size
+        span.grey
+          b Created at:
+          | #{file.createdAt}
+        span.grey
+          b Last updated at:
+          | #{file.updatedAt}
+  .file-actions
+    if user
+      button.secondary-button.edit-file-button
+        include ./icons/edit.pug
+        +editIcon("1.5em")
+        span Edit
+      button.secondary-button
+        include ./icons/delete.pug
+        +deleteIcon('1.5em')
+        span Delete
+    button.download-file-button.main-button
+      include ./icons/download.pug
+      +downloadIcon('1.5em')
+      span Download
+
+block append modals
+  if user
+    include file_form.pug
+    -
+      let fileEditFormArgs = {
+        name: 'file-update-form',
+        action: `/file/${file.id}/update`,
+        title: 'Edit file',
+        folders: folders,
+        values: 
+          {
+            name: values ? values.name : file.name, 
+            folder: values ? values.folder : file.folderId
+          },
+        errors: fileErrors ? fileErrors : null, 
+        serverError: fileFormError ? fileFormError : false
+      }
+    +fileForm(fileEditFormArgs)
+
+block append styles
+  link(rel='stylesheet', href='/styles/file.css')
+
+block append scripts
+  script.
+    if (`#{user}`)
+      const isFileEditFormOpen = `#{formOpen}` === 'file_update';
+      const fileEditForm = document.querySelector('.file-update-form').parentElement.parentElement;
+      fileEditForm.style.display = isFileEditFormOpen ? 'block' : 'none';
+      document.querySelector('.edit-file-button').addEventListener('click', () => {
+        fileEditForm.querySelector('form').reset();
+        fileEditForm.style.display = 'block';
+      });

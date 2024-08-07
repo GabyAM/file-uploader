@@ -5,7 +5,7 @@
 	"main": "index.js",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"start": "node --watch app.js"
+		"start": "nodemon app.js"
 	},
 	"author": "",
 	"license": "ISC",
@@ -14,19 +14,21 @@
 		"@quixo3/prisma-session-store": "^3.1.13",
 		"@supabase/supabase-js": "^2.45.0",
 		"base64-arraybuffer": "^1.0.2",
-		"ejs": "^3.1.10",
 		"eslint-config-prettier": "^9.1.0",
 		"express": "^4.19.2",
 		"express-session": "^1.18.0",
 		"express-validator": "^7.1.0",
 		"morgan": "^1.10.0",
 		"multer": "^1.4.5-lts.1",
-		"prettier": "^3.3.3"
+		"prettier": "^3.3.3",
+		"pug": "^3.0.3"
 	},
 	"devDependencies": {
+		"@prettier/plugin-pug": "^3.0.0",
 		"eslint": "^8.57.0",
 		"eslint-config-airbnb-base": "^15.0.0",
 		"eslint-plugin-import": "^2.29.1",
+		"nodemon": "^3.1.4",
 		"prisma": "^5.17.0"
 	}
 }

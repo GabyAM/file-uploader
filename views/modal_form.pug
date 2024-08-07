@@ -1,0 +1,32 @@
+mixin modalForm({name, action, enctype, title, formInputs, serverError})
+  .form-background
+    .form-card-wrapper
+      div(class=`${name} form-card`)
+        button.close-button
+          include ./icons/chevron.pug
+          +chevronIcon
+          span Back
+        form(method='POST', action=action, enctype=enctype)
+          h2= title
+          fieldset
+            include form_select.pug
+            include form_input.pug
+            each input in formInputs
+              -
+                let inputArgs = {
+                  ...input, 
+                  error: locals.errors && errors[input.name] ? errors[input.name] : '', 
+                  value: locals.values && values[input.name] ? values[input.name] : '' 
+                }
+              if type === "select"
+                +formSelect(inputArgs) 
+              else
+                +formInput(inputArgs)
+          button.main-button Upload
+          if serverError
+            include error_label.pug
+            +errorLabel(serverError)
+  script.
+    document.querySelector('.form-card.#{name} .close-button').addEventListener('click', () => {
+      document.querySelector('.form-card.#{name}').parentElement.parentElement.style.display = 'none';
+    });

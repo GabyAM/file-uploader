@@ -1,0 +1,31 @@
+extends layout
+block content
+  .heading-section
+    h2
+      a(href='/') Your space
+      | / #{folder.name}
+    div
+      button.secondary-button.edit-folder-button
+        include ./icons/edit.pug
+        +editIcon("1.5em")
+        span Edit
+      button.secondary-button
+        include ./icons/delete.pug
+        +deleteIcon('1.5em')
+        span Delete
+      button.secondary-button.share-folder-button
+        include ./icons/share.pug
+        +shareIcon('1.5em')
+        span Share
+  .folder-content
+    if locals.shareUrl
+      .share-message
+        span Here’s your new link to share the folder:
+        br
+        a(href=`http://localhost:3000/${shareUrl}`) http://localhost:3000/#{shareUrl}
+    .folder-files
+      if files
+        each file in files
+          include item_preview.pug
+          +itemPreview({name: file.name, icon: 'file', redirects: true, url: `/file/${file.id}` })
+

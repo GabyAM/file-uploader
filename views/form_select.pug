@@ -1,0 +1,24 @@
+mixin formSelect({name, label, value, error, options})
+  div(class=`input-container ${error ? 'error' : ''}`)
+    select.input(name=name, id=name)
+      if !value
+        option(disabled, hidden, selected, value='') label
+      each option in options
+        option(hidden=option.hidden, selected=value && !label, id=option.id, value=option.id) option.name
+    if error
+      include error_label.pug
+      +errorLabel(error)
+  script.
+    (function () {
+      const input = document.querySelector('##{name}');
+      let inputParent = input.parentElement;
+      input.addEventListener('focus', () => {
+        if (inputParent.classList.contains('error')) {
+          inputParent.classList.remove('error');
+        }
+        const errorLabel = inputParent.querySelector('.error-label');
+        if (inputParent.contains(errorLabel)) {
+          inputParent.removeChild(errorLabel);
+        }
+      });
+    })();

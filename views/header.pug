@@ -1,0 +1,27 @@
+link(rel='stylesheet', href='/styles/header.css')
+header
+  .upper-section
+    button.expand-button
+      include ./icons/menu.pug
+      +menuIcon('100%')
+    .user-info
+      if locals.user
+        h3 #{user.name}'s account
+        span= user.email
+      else
+        h3 Guest user
+    button.logout-button.main-button
+      include ./icons/logout.pug
+      +logoutIcon('1.5em')
+      span Log out
+
+  .lower-section
+    .actions-section
+      button.secondary-button.show-file-form-button
+        include ./icons/file_upload.pug
+        +fileUploadIcon('1.5em')
+        span Upload file
+      button.secondary-button.show-folder-form-button
+        include ./icons/folder_create.pug
+        +folderCreateIcon('1.5em')
+        span Add folder

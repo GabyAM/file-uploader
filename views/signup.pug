@@ -1,0 +1,24 @@
+html
+  head
+    meta(name='viewport', content='width=device-width, initial-scale=1')
+    meta(charset='utf-8')
+    link(rel='stylesheet', href='/styles/index.css')
+    link(rel='stylesheet', href='/styles/authscreen.css')
+    link(rel='stylesheet', href='/styles/form.css')
+  body
+    include error_label.pug
+    .auth-screen-background.form-background
+      .form-card-wrapper
+        if serverError
+          +errorLabel('An unexpected error happened during the registration')
+        div(class=`form-card ${serverError ? 'error' : ''}`)
+          h2 Sign up to start uploading files
+          form(action='/signup', method='POST')
+            fieldset
+              include form_input.pug
+              +formInput({ value: locals.values && values.name ? values.name : '', error: locals.errors && errors.name ? errors.name : '', type: 'text', name: 'name', label: 'Name' })
+              +formInput({ value: locals.values && values.email ? values.email : '', error: locals.errors && errors.email ? errors.email : '', type: 'text', name: 'email', label: 'Email' })
+              +formInput({ value: locals.values && values.password ? values.password : '', error: locals.errors && errors.password ? errors.password : '', type: 'password', name: 'password', label: 'Password' }) 
+              +formInput({ value: locals.values && values.passwordConfirm ? values.passwordConfirm : '', error: locals.errors && errors.passwordConfirm ? errors.passwordConfirm : '', type: 'password', name: 'passwordConfirm', label: 'Confirm password' })
+            button.main-button Send
+          span Already have an account? #[a(href='/login') Log in]

@@ -12,5 +12,16 @@
   "jsxSingleQuote": false,
   "jsxBracketSameLine": false,
   "editor.formatOnSave": true,
-  "requireConfig": false
+  "requireConfig": false,
+  "overrides": [
+    {
+      "files": "**/*.pug",
+      "options": {
+        "plugins": ["@prettier/plugin-pug"],
+        "pugPrintWidth": 120,
+        "pugTabWidth": 2,
+        "pugUseTabs": false
+      }
+    }
+  ]
 }

@@ -1,0 +1,6 @@
+mixin errorLabel(message)
+  link(rel='stylesheet', href='/styles/errorlabel.css')
+  .error-label
+    include ./icons/error.pug
+    +errorIcon
+    span= message

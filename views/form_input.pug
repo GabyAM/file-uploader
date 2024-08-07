@@ -1,0 +1,39 @@
+mixin formInput({type, name, label, value, error})
+  if type === 'password'
+    include password_input.pug
+    +passwordInput({name, label, value, error})
+  else
+    div(class=`input-container ${error ? 'error' : ''}`)
+      if type === 'file'
+        label.input(for=name)= label
+      input.input(placeholder=label, type=type, name=name, id=name, value=value)
+      if error
+        include error_label.pug
+        +errorLabel(error)
+  script.
+    (function () {
+      const name = '#{name}';
+      const type = '#{type}';
+      const input = document.querySelector(`#${name}`);
+      let inputParent = input.parentElement;
+      //password inputs have an additional wrapper
+      if (type === 'password') inputParent = inputParent.parentElement;
+      input.addEventListener('focus', () => {
+        if (inputParent.classList.contains('error')) {
+          inputParent.classList.remove('error');
+        }
+        const errorLabel = inputParent.querySelector('.error-label');
+        if (inputParent.contains(errorLabel)) {
+          inputParent.removeChild(errorLabel);
+        }
+      });
+
+      if (type === 'file') {
+        input.addEventListener('change', e => {
+          if (e.target.files && e.target.files[0]) {
+            const label = input.labels[0];
+            label.textContent = e.target.files[0].name;
+          }
+        });
+      }
+    })();

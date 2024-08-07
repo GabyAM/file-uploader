@@ -1,0 +1,53 @@
+link(rel='stylesheet', href='/styles/navbar.css')
+
+nav
+  .menu-button-container
+    button.expand-button
+      include ./icons/menu.pug
+      +menuIcon('100%')
+  if user
+    div
+      .actions-section
+        button.secondary-button.show-file-form-button
+          include ./icons/file_upload.pug
+          +fileUploadIcon('1.5em')
+          span Upload file
+        button.secondary-button.show-folder-form-button
+          include ./icons/folder_create.pug
+          +folderCreateIcon('1.5em')
+          span Add folder
+    section.items-section
+      h2 Your space
+      div
+        ul.items-list
+          if folders
+            - let selectedFolder = folder?.id || null
+            each folder in folders
+              a(href=`/folder/${folder.id}`)
+                li(class=(selectedFolder === folder.id ? 'selected' : ''))
+                  include ./icons/folder.pug
+                  +folderIcon('1.75em')
+                  span= folder.name
+          if rootFiles
+            - let selectedFile = file?.id || null
+            each file in rootFiles
+              a(href=`/file/${file.id}`)
+                li(class=(selectedFile === file.id ? 'selected' : ''))
+                  include ./icons/file.pug
+                  +fileIcon('1.75em')
+                  span= file.name
+    section.storage-section
+      h2 Storage
+      .storage-bar-container
+        if user && user.usedSpaceFormatted
+          span #{user.usedSpaceFormatted} of 50MB used
+          .storage-space-bar
+
+script.
+  const storageBar = document.querySelector('.storage-space-bar');
+
+  if (`#{user}`) {
+    const user = `#{user}`;
+    const usedPercentage = (Number(user?.usedSpace || 0) * 100) / 52428800;
+    storageBar.style.background = `linear-gradient(to right, #A09EFF ${usedPercentage}%, #1C1C25 ${usedPercentage}%)`;
+  }

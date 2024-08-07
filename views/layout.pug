@@ -1,0 +1,101 @@
+html
+  head
+    meta(name='viewport', content='width=device-width, initial-scale=1')
+    meta(charset='utf-8')
+    link(rel='stylesheet', href='/styles/index.css')
+    link(rel='stylesheet', href='/styles/layout.css')
+    link(rel='stylesheet', href='/styles/form.css')
+    block styles
+  body
+    include navbar.pug
+    main
+      include header.pug
+      .content-container
+        block content
+    if generalError
+      .general-error-tag
+        span= generalError
+        button
+          include ./icons/close.pug
+          +closeIcon("1em")
+    block modals
+      if user
+        -
+          let folderFormArgs = {
+            action: '/folder/',
+            name: 'add-folder-form',  
+            title: 'Add a new folder', 
+            errors: folderErrors ? folderErrors : null, 
+            serverError: folderFormError ? folderFormError : false
+          }
+        include folder_form.pug
+        +folderForm(folderFormArgs)
+        -
+          let fileFormArgs = {
+            name: 'upload-file-form', 
+            action: '/file/upload',
+            title: 'Upload a new file', 
+            folders: folders, 
+            errors: fileErrors ? fileErrors : null, 
+            serverError: fileFormError ? fileFormError : false
+          }
+        include file_form.pug
+        +fileForm(fileFormArgs)
+  block scripts
+    script.
+      const navbar = document.querySelector('nav');
+      const expandButtons = document.querySelectorAll('.expand-button');
+
+      expandButtons.forEach(btn =>
+        btn.addEventListener('click', () => {
+          navbar.classList.toggle('visible');
+        }),
+      );
+
+      function isNavbarButton(element) {
+        value = false;
+        expandButtons.forEach(btn => {
+          if (btn.contains(element)) {
+            value = true;
+          }
+        });
+        return value;
+      }
+
+      window.addEventListener('click', e => {
+        if (e.target !== navbar && !isNavbarButton(e.target) && navbar.classList.contains('visible')) {
+          console.log(e.target);
+          navbar.classList.remove('visible');
+        }
+      });
+
+      if (`#{user}`) {
+        const isFileFormOpen = '#{formOpen}' === 'file_upload';
+        const isFolderFormOpen = '#{formOpen}' === 'folder_create';
+        const fileForm = document.querySelector('.upload-file-form').parentElement.parentElement;
+        const folderForm = document.querySelector('.add-folder-form').parentElement.parentElement;
+        fileForm.style.display = isFileFormOpen ? 'block' : 'none';
+        folderForm.style.display = isFolderFormOpen ? 'block' : 'none';
+
+        const fileFormButtons = document.querySelectorAll('.show-file-form-button');
+        fileFormButtons.forEach(button =>
+          button.addEventListener('click', () => {
+            fileForm.querySelector('form').reset();
+            fileForm.style.display = 'block';
+          }),
+        );
+
+        const addFolderButtons = document.querySelectorAll('.show-folder-form-button');
+        addFolderButtons.forEach(button =>
+          button.addEventListener('click', () => {
+            folderForm.querySelector('form').reset();
+            folderForm.style.display = 'block';
+          }),
+        );
+      }
+
+      const closeErrorTag = document.querySelector('.general-error-tag button');
+      if (closeErrorTag)
+        closeErrorTag.addEventListener('click', () => {
+          document.querySelector('.general-error-tag').parentElement.removeChild(document.querySelector('.general-error-tag'));
+        });

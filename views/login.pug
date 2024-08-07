@@ -1,0 +1,38 @@
+html
+  head
+    meta(name='viewport', content='width=device-width, initial-scale=1')
+    meta(charset='utf-8')
+    link(rel='stylesheet', href='/styles/index.css')
+    link(rel='stylesheet', href='/styles/authscreen.css')
+    link(rel='stylesheet', href='/styles/form.css')
+  body
+    include error_label.pug
+    .auth-screen-background.form-background
+      .form-card-wrapper
+        if serverError
+          +errorLabel('An unexpected error happened during the login')
+        div(class=`form-card ${serverError ? 'error' : ''}`)
+          h2 Login to continue uploading files
+          form(action='/login', method='POST')
+            include form_input.pug
+            fieldset
+              -
+                let emailArgs = { 
+                  value: values && values.email ? values.email : '',
+                  error: errors && errors.email ? errors.email : '', 
+                  type: 'text', 
+                  name: 'email', 
+                  label: 'Email' 
+                }
+              +formInput(emailArgs)
+              -
+                let passwordArgs = {
+                  value: values && values.password ? values.password : '', 
+                  error: errors && errors.password ? errors.password : '', 
+                  type: 'password', 
+                  name: 'password', 
+                  label: 'Password' 
+                }
+              +formInput(passwordArgs)
+            button.main-button Send
+          span Don't have an account? #[a(href='/signup') Sign up] now

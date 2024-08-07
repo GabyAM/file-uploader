@@ -1,0 +1,27 @@
+mixin itemPreview({icon, name, redirects, url})
+  link(rel='stylesheet', href='/styles/itempreview.css')
+  if redirects
+    a.item(href=url)
+      div
+        .item-icon
+          if icon === 'folder'
+            include ./icons/folder.pug
+            +folderIcon('100%')
+          else
+            include ./icons/file.pug
+            +fileIcon('100%')
+        if name
+          span= name
+  else
+    .item
+      .item-icon
+        if icon === 'folder'
+          include ./icons/folder.pug
+          +folderIcon('100%')
+        else
+          include ./icons/file.pug
+          +fileIcon('100%')
+      if name
+        span= name
+
+//- could have used a mixin to conditionally wrap this but... meh
