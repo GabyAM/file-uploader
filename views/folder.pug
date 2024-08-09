@@ -1,22 +1,26 @@
 extends layout
 block content
   .heading-section
-    h2
-      a(href='/') Your space
-      | / #{folder.name}
-    div
-      button.secondary-button.edit-folder-button
-        include ./icons/edit.pug
-        +editIcon("1.5em")
-        span Edit
-      button.secondary-button
-        include ./icons/delete.pug
-        +deleteIcon('1.5em')
-        span Delete
-      button.secondary-button.share-folder-button
-        include ./icons/share.pug
-        +shareIcon('1.5em')
-        span Share
+    if user
+      h2
+        a(href='/') Your space
+        |
+        | / #{folder.name}
+      div
+        button.secondary-button.edit-folder-button
+          include ./icons/edit.pug
+          +editIcon("1.5em")
+          span Edit
+        button.secondary-button.delete-folder-button
+          include ./icons/delete.pug
+          +deleteIcon('1.5em')
+          span Delete
+        button.secondary-button.share-folder-button
+          include ./icons/share.pug
+          +shareIcon('1.5em')
+          span Share
+    else 
+      h2 Shared folders / #{folder.name}
   .folder-content
     if locals.shareUrl
       .share-message
@@ -27,5 +31,46 @@ block content
       if files
         each file in files
           include item_preview.pug
-          +itemPreview({name: file.name, icon: 'file', redirects: true, url: `/file/${file.id}` })
+          +itemPreview({name: file.name, icon: 'file', redirects: true, url: `${share ? `/share/${share.id}` : ''}/file/${file.id}` })
 
+block append modals
+  if user
+    include modal_form.pug
+    -
+      let folderShareFormArgs = {
+          name: 'folder-share-form',
+          action: `/folder/${folder.id}/share`,
+          enctype: 'application/x-www-form-urlencoded',
+          title: 'Share this folder',
+          formInputs: [
+            {type: 'select', 
+            options: 
+              [
+                {id: '12h', name: '12 hours' },
+                {id: '1d', name: '1 day' },
+                {id: '3d', name: '3 days' },
+                {id: '1w', name: '1 week'}
+              ], 
+            name: 'duration',
+            label: 'How long?'}
+          ],
+          errors: folderShareErrors ? folderShareErrors : null, 
+          serverError: folderShareFormError ? folderShareFormError : false,
+          values: values ? values.duration : ''
+      }
+    +modalForm(folderShareFormArgs)
+
+block append styles
+  link(rel='stylesheet', href='/styles/folder.css')
+
+block append scripts
+  script.
+    if (`#{user}`) {
+      const isFolderShareFormOpen = `#{formOpen}` === 'folder_share';
+      const folderShareForm = document.querySelector('.folder-share-form').parentElement.parentElement;
+      folderShareForm.style.display = isFolderShareFormOpen ? 'block' : 'none';
+      document.querySelector('.share-folder-button').addEventListener('click', () => {
+        folderShareForm.querySelector('form').reset();
+        folderShareForm.style.display = 'block';
+      });
+    }

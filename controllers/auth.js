@@ -9,7 +9,12 @@ const formatSize = require('../utils/sizeFormatter');
 exports.getLoginPage = [
   authenticate({successRedirect: '/'}),
   (req, res, next) => {
-    res.render('login.ejs');
+    let props = {};
+    if (req.session.error) {
+      props.mainError = req.session.error;
+      delete req.session.error;
+    }
+    res.render('login.pug', props);
   },
 ];
 

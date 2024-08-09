@@ -1,4 +1,4 @@
-const {body} = require('express-validator');
+const {body, param} = require('express-validator');
 const upload = require('../config/multer');
 const {authenticate} = require('../middleware/authentication');
 const prisma = require('../config/prisma');
@@ -66,6 +66,38 @@ const formatFileDetails = file => {
   file.updatedAt = file.updatedAt.toLocaleDateString() + ' ' + file.updatedAt.toLocaleTimeString();
 };
 
+const validateId = field =>
+  param(field)
+    .isUUID()
+    .withMessage('Invalid file id')
+    .custom(async (value, {req}) => {
+      let file;
+      try {
+        file = await prisma.file.findUnique({where: {id: value}});
+      } catch (e) {
+        throw new Error('EXTERNAL_ERROR: Error while validating folder id');
+      }
+      if (!file) throw new Error('File not found');
+      req.file = file;
+    });
+const validateShareId = () =>
+  param('shareid')
+    .isUUID()
+    .withMessage('invalid share id')
+    .custom(async (value, {req}) => {
+      let share;
+      try {
+        share = await prisma.share.findFirst({where: {id: value}});
+      } catch (e) {
+        throw new Error('EXTERNAL_ERROR: Error while validating share id');
+      }
+      if (!share) {
+        throw new Error('The resource was not found');
+      }
+      req.share = share;
+      return true;
+    });
+
 exports.getFilePage = [
   authenticate({failureRedirect: '/login'}),
   handleAsync(async (req, res, next) => {
@@ -85,6 +117,36 @@ exports.getFilePage = [
       user: req.session.user,
     };
     res.render('file.ejs', {...layoutProps, file});
+
+exports.getSharedFilePage = [
+  validateId('fileid'),
+  validateShareId(),
+  validate,
+  handleAsync(async (req, res, next) => {
+    if (req.validationResult) {
+      if (req.validationResult.internalError) {
+        req.session.error = 'An unexpected error happened';
+      } else
+        req.session.error =
+          req.validationResult.validationErrors.shareid ||
+          req.validationResult.validationErrors.fileid;
+      res.redirect('/');
+    }
+    const folder = await prisma.folder.findUnique({where: {id: req.file.folderId}});
+    req.file.folder = folder;
+    formatFileDetails(req.file);
+
+    let layoutProps = {};
+    if (req.session.user) {
+      layoutProps = {
+        rootFiles: await prisma.file.findMany({
+          where: {uploaderId: req.session.user.id, folderId: null},
+        }),
+        folders: await prisma.folder.findMany({where: {ownerId: req.session.user.id}}),
+        user: req.session.user,
+      };
+    }
+    res.render('file.pug', {...layoutProps, file: req.file, share: req.share});
   }),
 ];
 

@@ -14,4 +14,8 @@ router.get('/signup', authController.getSignupPage);
 
 router.post('/signup', authController.postSignup);
 
+router.get('/share/:id', folderController.getSharedFolderPage);
+
+router.get('/share/:shareid/file/:fileid', fileController.getSharedFilePage);
+
 module.exports = router;

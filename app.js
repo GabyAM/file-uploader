@@ -39,7 +39,8 @@ app.use('/file', fileRouter);
 
 app.use((err, req, res, next) => {
   console.log(err);
-  res.status(err.statusCode || 500).send(err.message);
+  req.session.error = 'An unexpected error happened';
+  res.redirect('/');
 });
 
 const port = process.env.PORT || 3000;

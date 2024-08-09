@@ -1,7 +1,10 @@
 extends layout
 block content
   .heading-section
-    h2 Your space / #{file.folder ? file.folder.name : ''}
+    if user
+      h2 #[a(href='/') Your space] / #{file.folder ? file.folder.name : ''}
+    else 
+      h2 Shared folders / #{file.folder ? file.folder.name : ''}
   .file-detail
     include item_preview.pug
     +itemPreview({icon: 'file'}) 
@@ -9,18 +12,9 @@ block content
       h3= file.name
       .file-info-details
         div
-          span
-            b= file.type
-          |
-          | •
-          span
-            b= file.size
-        span.grey
-          b Created at:
-          | #{file.createdAt}
-        span.grey
-          b Last updated at:
-          | #{file.updatedAt}
+          span #[b= file.type] • #[b= file.size]
+        span.grey #[b Created at:] #{file.createdAt}
+        span.grey #[b Last updated at:] #{file.updatedAt}
   .file-actions
     if user
       button.secondary-button.edit-file-button

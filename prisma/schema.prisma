@@ -45,6 +45,16 @@ model Folder {
   owner User @relation(fields: [ownerId], references: [id])
   ownerId String @db.Uuid
   files File[]
+  shares Share[]
+}
+
+model Share {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  expiration DateTime?
+  folder Folder @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  folderId String @db.Uuid
 }
 
 model Session {
