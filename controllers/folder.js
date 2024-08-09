@@ -3,6 +3,8 @@ const prisma = require('../config/prisma');
 const {authenticate} = require('../middleware/authentication');
 const handleAsync = require('../utils/asyncHandler');
 const validate = require('../middleware/validation');
+const supabase = require('../config/supabase');
+const formatSize = require('../utils/sizeFormatter');
 
 const renameFolder = async (value, {req}) => {
   let otherFolders;
@@ -229,3 +231,40 @@ exports.postFolderShare = [
   }),
 ];
 
+exports.postFolderDelete = [
+  authenticate({failureRedirect: '/login'}),
+  handleIdValidation(),
+  handleAsync(async (req, res, next) => {
+    let size = await prisma.file.aggregate({
+      where: {folderId: req.folder.id},
+      _sum: {size: true},
+    });
+    size = size._sum.size || 0;
+
+    const files = await prisma.file.findMany({
+      where: {folderId: req.folder.id},
+      select: {url: true},
+    });
+    const urls = files.map(file => file.url);
+
+    if (size === 0) {
+      await prisma.folder.delete({where: {id: req.folder.id}});
+    } else {
+      await prisma.$transaction([
+        prisma.folder.delete({where: {id: req.folder.id}}),
+        prisma.user.update({
+          where: {id: req.session.user.id},
+          data: {usedSpace: {decrement: size}},
+        }),
+      ]);
+
+      req.session.user.usedSpace -= size;
+      req.session.user.usedSpaceFormatted = formatSize(req.session.user.usedSpace);
+
+      await supabase.storage.from('Files').remove(urls);
+      //supabase doesn't support transactions, so there isn't much i can do to handle this better
+    }
+
+    res.redirect(`/`);
+  }),
+];

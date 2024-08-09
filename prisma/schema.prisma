@@ -32,7 +32,7 @@ model File {
   url String
   uploader User @relation(fields: [uploaderId], references: [id])
   uploaderId String @db.Uuid
-  folder Folder? @relation(fields: [folderId], references: [id])
+  folder Folder? @relation(fields: [folderId], references: [id], onDelete: Cascade)
   folderId String? @db.Uuid
   @@unique([name, folderId])
 }
