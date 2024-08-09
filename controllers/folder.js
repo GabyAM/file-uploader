@@ -135,6 +135,41 @@ exports.postFolderCreate = [
   }),
 ];
 
+exports.postFolderUpdate = [
+  authenticate({failureRedirect: '/login'}),
+  handleIdValidation(),
+  body('name')
+    .default('')
+    .isString()
+    .withMessage('Name has to be a string')
+    .customSanitizer(renameFolder)
+    .escape(),
+  validate,
+  handleAsync(async (req, res, next) => {
+    if (req.validationResult) {
+      const {internalError, validationErrors} = req.validationResult;
+      const layoutProps = {
+        rootFiles: await prisma.file.findMany({
+          where: {uploaderId: req.session.user.id, folderId: null},
+        }),
+        folders: await prisma.folder.findMany({where: {ownerId: req.session.user.id}}),
+        user: req.session.user,
+      };
+      const props = {
+        folderFiles: await prisma.file.findMany({where: {folderId: req.folder.id}}),
+        folderEditFormError: internalError,
+        folderEditErrors: validationErrors,
+        formOpen: 'folder_update',
+      };
+
+      return res.render('folder.pug', {...layoutProps, ...props});
+    }
+
+    await prisma.folder.update({where: {id: req.params.id}, data: {name: req.body.name}});
+    res.redirect(`/folder/${req.params.id}`);
+  }),
+];
+
 exports.postFolderShare = [
   authenticate({failureRedirect: '/login'}),
   handleIdValidation(),

@@ -35,7 +35,20 @@ block content
 
 block append modals
   if user
+    include folder_form.pug
     include modal_form.pug
+    -
+      let folderEditFormArgs = {
+        name: 'folder-update-form',
+        action: `/folder/${folder.id}/update`,
+        title: 'Edit folder',
+        values: 
+          {
+            name: values ? values.name : folder.name, 
+          },
+        errors: folderEditErrors ? folderEditErrors : null, 
+        serverError: folderEditFormError ? folderEditFormError : false
+      }
     -
       let folderShareFormArgs = {
           name: 'folder-share-form',
@@ -58,6 +71,7 @@ block append modals
           serverError: folderShareFormError ? folderShareFormError : false,
           values: values ? values.duration : ''
       }
+    +folderForm(folderEditFormArgs)
     +modalForm(folderShareFormArgs)
 
 block append styles
@@ -66,9 +80,20 @@ block append styles
 block append scripts
   script.
     if (`#{user}`) {
+      const isFolderEditFormOpen = `#{formOpen}` === 'folder_update';
       const isFolderShareFormOpen = `#{formOpen}` === 'folder_share';
+
+      const folderEditForm = document.querySelector('.folder-update-form').parentElement.parentElement;
       const folderShareForm = document.querySelector('.folder-share-form').parentElement.parentElement;
+
+      folderEditForm.style.display = isFolderEditFormOpen ? 'block' : 'none';
       folderShareForm.style.display = isFolderShareFormOpen ? 'block' : 'none';
+      folderDeleteForm.style.display = isFolderDeleteFormOpen ? 'block' : 'none';
+
+      document.querySelector('.edit-folder-button').addEventListener('click', () => {
+        folderEditForm.querySelector('form').reset();
+        folderEditForm.style.display = 'block';
+      });
       document.querySelector('.share-folder-button').addEventListener('click', () => {
         folderShareForm.querySelector('form').reset();
         folderShareForm.style.display = 'block';
