@@ -80,6 +80,19 @@ const validateId = field =>
       if (!file) throw new Error('File not found');
       req.file = file;
     });
+const handleIdValidation = (field = 'id') => [
+  validateId(field),
+  validate,
+  (req, res, next) => {
+    if (req.validationResult) {
+      req.session.error = req.validationResult.internalError
+        ? 'An unexpected error happened'
+        : req.validationResult.validationErrors[field];
+      return res.redirect('/');
+    }
+    next();
+  },
+];
 const validateShareId = () =>
   param('shareid')
     .isUUID()
@@ -263,6 +276,40 @@ exports.postDeleteFile = [
     req.session.user.usedSpaceFormatted = formatSize(req.session.user.usedSpace);
 
     res.redirect(req.file.folder ? `/folder/${req.file.folder.id}` : '/');
+  }),
+];
+
+exports.postDownloadFile = [
+  (req, res, next) => {
+    if (req.body.shareid) {
+      req.params.shareid = req.body.shareid;
+      validateShareId()(req, res, next);
+    } else {
+      authenticate({failureRedirect: '/login'})(req, res, next);
+    }
+  },
+  validateId('fileid'),
+  validate,
+  (req, res, next) => {
+    if (req.validationResult) {
+      req.session.error = req.validationResult.internalError
+        ? 'An unexpected error happened'
+        : req.validationResult.validationErrors.shareid ||
+          req.validationResult.validationErrors.fileid;
+      return res.redirect('/');
+    }
+    next();
+  },
+  handleAsync(async (req, res, next) => {
+    const {data, error} = await supabase.storage.from('Files').download(req.file.url);
+
+    const arraybuffer = await data.arrayBuffer();
+    const buffer = Buffer.from(arraybuffer);
+    const readStream = new Stream.PassThrough();
+    readStream.end(buffer);
+    res.set('Content-Disposition', `attachment; filename="${req.file.url}"`);
+    res.set('Content-Type', 'text-plain');
+    readStream.pipe(res);
   }),
 ];
 

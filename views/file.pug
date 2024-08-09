@@ -25,10 +25,13 @@ block content
         include ./icons/delete.pug
         +deleteIcon('1.5em')
         span Delete
-    button.download-file-button.main-button
-      include ./icons/download.pug
-      +downloadIcon('1.5em')
-      span Download
+    form(action=`/file/${file.id}/download`, method="POST")
+      if share
+        input(hidden="hidden", type="text", name="shareid", value=share.id)
+      button.download-file-button.main-button
+        include ./icons/download.pug
+        +downloadIcon('1.5em')
+        span Download
 
 block append modals
   if user
