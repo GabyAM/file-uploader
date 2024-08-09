@@ -21,7 +21,7 @@ block content
         include ./icons/edit.pug
         +editIcon("1.5em")
         span Edit
-      button.secondary-button
+      button.secondary-button.delete-file-button
         include ./icons/delete.pug
         +deleteIcon('1.5em')
         span Delete
@@ -33,6 +33,7 @@ block content
 block append modals
   if user
     include file_form.pug
+    include delete_modal.pug
     -
       let fileEditFormArgs = {
         name: 'file-update-form',
@@ -47,18 +48,34 @@ block append modals
         errors: fileErrors ? fileErrors : null, 
         serverError: fileFormError ? fileFormError : false
       }
+    -
+      let fileDeleteFormArgs = {
+        name: 'file-delete-form',
+        action: `/file/${file.id}/delete`,
+        title: 'Delete file',
+        description: "Are you sure you want to delete this file? it can't be recovered later"
+      }
     +fileForm(fileEditFormArgs)
-
+    +deleteModal(fileDeleteFormArgs)
+    
 block append styles
   link(rel='stylesheet', href='/styles/file.css')
 
 block append scripts
   script.
-    if (`#{user}`)
+    if (`#{user}`) {
       const isFileEditFormOpen = `#{formOpen}` === 'file_update';
+      const isFileDeleteFormOpen = `#{formOpen}` === 'file_delete';
       const fileEditForm = document.querySelector('.file-update-form').parentElement.parentElement;
+      const fileDeleteForm = document.querySelector('.file-delete-form').parentElement.parentElement;
       fileEditForm.style.display = isFileEditFormOpen ? 'block' : 'none';
+      fileDeleteForm.style.display = isFileDeleteFormOpen ? 'block' : 'none';
       document.querySelector('.edit-file-button').addEventListener('click', () => {
         fileEditForm.querySelector('form').reset();
         fileEditForm.style.display = 'block';
       });
+      document.querySelector('.delete-file-button').addEventListener('click', () => {
+        fileDeleteForm.querySelector('form').reset();
+        fileDeleteForm.style.display = 'block';
+      });
+    }

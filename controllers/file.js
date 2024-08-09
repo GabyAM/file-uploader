@@ -246,3 +246,23 @@ exports.postUploadFile = [
     } else res.redirect('/');
   }),
 ];
+
+exports.postDeleteFile = [
+  authenticate({failureRedirect: 'login'}),
+  handleIdValidation(),
+  handleAsync(async (req, res, next) => {
+    await prisma.$transaction([
+      prisma.user.update({
+        where: {id: req.session.user.id},
+        data: {usedSpace: {decrement: req.file.size}},
+      }),
+      prisma.file.delete({where: {id: req.file.id}}),
+    ]);
+
+    req.session.user.usedSpace -= req.file.size;
+    req.session.user.usedSpaceFormatted = formatSize(req.session.user.usedSpace);
+
+    res.redirect(req.file.folder ? `/folder/${req.file.folder.id}` : '/');
+  }),
+];
+
