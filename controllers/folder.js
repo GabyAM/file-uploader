@@ -3,6 +3,7 @@ const prisma = require('../config/prisma');
 const {authenticate} = require('../middleware/authentication');
 const handleAsync = require('../utils/asyncHandler');
 const validate = require('../middleware/validation');
+const renderPage = require('../middleware/render');
 const supabase = require('../config/supabase');
 const formatSize = require('../utils/sizeFormatter');
 
@@ -54,15 +55,8 @@ exports.getFolderPage = [
   authenticate({failureRedirect: '/'}),
   handleIdValidation(),
   handleAsync(async (req, res, next) => {
-    const layoutProps = {
-      rootFiles: await prisma.file.findMany({
-        where: {uploaderId: req.session.user.id, folderId: null},
-      }),
-      folders: await prisma.folder.findMany({where: {ownerId: req.session.user.id}}),
-      user: req.session.user,
-    };
     const files = await prisma.file.findMany({where: {folderId: req.params.id}});
-    res.render('folder.pug', {...layoutProps, folder: req.folder, files});
+    return renderPage('folder', {folder: req.folder, files})(req, res, next);
   }),
 ];
 
@@ -80,22 +74,12 @@ exports.getSharedFolderPage = [
       res.redirect('/');
     }
 
-    let layoutProps = {};
-    if (req.session.user) {
-      layoutProps = {
-        rootFiles: await prisma.file.findMany({
-          where: {uploaderId: req.session.user.id, folderId: null},
-        }),
-        folders: await prisma.folder.findMany({where: {ownerId: req.session.user.id}}),
-        user: req.session.user,
-      };
-    }
     const props = {
       folder: await prisma.folder.findFirst({where: {id: share.folderId}}),
       files: await prisma.file.findMany({where: {folderId: share.folderId}}),
       share,
     };
-    res.render('folder.pug', {...layoutProps, ...props});
+    return renderPage('folder', props)(req, res, next);
   }),
 ];
 
@@ -116,19 +100,8 @@ exports.postFolderCreate = [
         folderErrors: validationErrors,
         formOpen: 'folder_create',
       };
-      const layoutProps = {
-        rootFiles: await prisma.file.findMany({
-          where: {uploaderId: req.session.user.id, folderId: null},
-        }),
-        isRoot: true,
-        folders: await prisma.folder.findMany({where: {ownerId: req.session.user.id}}),
-        user: req.session.user,
-      };
 
-      return res.render('folder.pug', {
-        ...layoutProps,
-        ...props,
-      });
+      return renderPage('root_folder', props)(req, res, next);
     }
     const folder = await prisma.folder.create({
       data: {ownerId: req.session.user.id, name: req.body.name},
@@ -150,13 +123,6 @@ exports.postFolderUpdate = [
   handleAsync(async (req, res, next) => {
     if (req.validationResult) {
       const {internalError, validationErrors} = req.validationResult;
-      const layoutProps = {
-        rootFiles: await prisma.file.findMany({
-          where: {uploaderId: req.session.user.id, folderId: null},
-        }),
-        folders: await prisma.folder.findMany({where: {ownerId: req.session.user.id}}),
-        user: req.session.user,
-      };
       const props = {
         folderFiles: await prisma.file.findMany({where: {folderId: req.folder.id}}),
         folderEditFormError: internalError,
@@ -164,7 +130,7 @@ exports.postFolderUpdate = [
         formOpen: 'folder_update',
       };
 
-      return res.render('folder.pug', {...layoutProps, ...props});
+      return renderPage('folder', props)(req, res, next);
     }
 
     await prisma.folder.update({where: {id: req.params.id}, data: {name: req.body.name}});
@@ -186,13 +152,6 @@ exports.postFolderShare = [
   handleAsync(async (req, res, next) => {
     if (req.validationResult) {
       const {internalError, validationErrors} = req.validationResult;
-      const layoutProps = {
-        rootFiles: await prisma.file.findMany({
-          where: {uploaderId: req.session.user.id, folderId: null},
-        }),
-        folders: await prisma.folder.findMany({where: {ownerId: req.session.user.id}}),
-        user: req.session.user,
-      };
       const props = {
         folderShareFormError: internalError,
         folderShareErrors: validationErrors,
@@ -201,7 +160,7 @@ exports.postFolderShare = [
         files: await prisma.file.findMany({where: {folderId: req.folder.id}}),
       };
 
-      return res.render('folder.pug', {...layoutProps, ...props});
+      return renderPage('folder', props)(req, res, next);
     }
     const expirations = {
       '12h': 1000 * 60 * 60 * 12,
@@ -215,19 +174,12 @@ exports.postFolderShare = [
       data: {folderId: req.folder.id, expiration: shareExpiration},
     });
 
-    const layoutProps = {
-      rootFiles: await prisma.file.findMany({
-        where: {uploaderId: req.session.user.id, folderId: null},
-      }),
-      folders: await prisma.folder.findMany({where: {ownerId: req.session.user.id}}),
-      user: req.session.user,
-    };
     const props = {
       folder: req.folder,
       files: await prisma.file.findMany({where: {folderId: req.folder.id}}),
       shareUrl: `share/${share.id}`,
     };
-    res.render('folder.pug', {...layoutProps, ...props});
+    return renderPage('folder', props)(req, res, next);
   }),
 ];
 

@@ -78,7 +78,7 @@ const validateId = field =>
         throw new Error('EXTERNAL_ERROR: Error while validating folder id');
       }
       if (!file) throw new Error('File not found');
-      req.file = file;
+      req.fileData = file;
     });
 const handleIdValidation = (field = 'id') => [
   validateId(field),
@@ -113,23 +113,17 @@ const validateShareId = () =>
 
 exports.getFilePage = [
   authenticate({failureRedirect: '/login'}),
+  handleIdValidation(),
   handleAsync(async (req, res, next) => {
-    const file = await prisma.file.findUnique({
-      where: {id: req.params.id},
-    });
-    formatFileDetails(file);
-    const folders = await prisma.folder.findMany({where: {ownerId: req.session.user.id}});
-    if (file.folderId) {
-      file.folder = folders.find(f => f.id === file.folderId);
+    if (req.fileData.folderId) {
+      const folder = await prisma.folder.findUnique({where: {id: req.fileData.folderId}});
+      req.fileData.folder = folder;
     }
-    const layoutProps = {
-      rootFiles: await prisma.file.findMany({
-        where: {uploaderId: req.session.user.id, folderId: null},
-      }),
-      folders,
-      user: req.session.user,
-    };
-    res.render('file.ejs', {...layoutProps, file});
+    formatFileDetails(req.fileData);
+
+    return renderPage('file', {file: req.fileData})(req, res, next);
+  }),
+];
 
 exports.getSharedFilePage = [
   validateId('fileid'),
@@ -145,21 +139,11 @@ exports.getSharedFilePage = [
           req.validationResult.validationErrors.fileid;
       res.redirect('/');
     }
-    const folder = await prisma.folder.findUnique({where: {id: req.file.folderId}});
-    req.file.folder = folder;
-    formatFileDetails(req.file);
+    const folder = await prisma.folder.findUnique({where: {id: req.fileData.folderId}});
+    req.fileData.folder = folder;
+    formatFileDetails(req.fileData);
 
-    let layoutProps = {};
-    if (req.session.user) {
-      layoutProps = {
-        rootFiles: await prisma.file.findMany({
-          where: {uploaderId: req.session.user.id, folderId: null},
-        }),
-        folders: await prisma.folder.findMany({where: {ownerId: req.session.user.id}}),
-        user: req.session.user,
-      };
-    }
-    res.render('file.pug', {...layoutProps, file: req.file, share: req.share});
+    res.render('file', {file: req.fileData, share: req.share});
   }),
 ];
 
@@ -226,7 +210,7 @@ exports.postUploadFile = [
         fileErrors: validationErrors,
       };
 
-      return renderIndex(req, res, next, props);
+      return renderPage('index', props)(req, res, next);
     }
 
     const fileName = `${Date.now()}_${Math.round(Math.random() * 1e9)}${path.extname(req.file.originalname)}`;
@@ -275,7 +259,7 @@ exports.postDeleteFile = [
     req.session.user.usedSpace -= req.file.size;
     req.session.user.usedSpaceFormatted = formatSize(req.session.user.usedSpace);
 
-    res.redirect(req.file.folder ? `/folder/${req.file.folder.id}` : '/');
+    res.redirect(req.fileData.folderId ? `/folder/${req.fileData.folderId}` : '/');
   }),
 ];
 
@@ -301,13 +285,13 @@ exports.postDownloadFile = [
     next();
   },
   handleAsync(async (req, res, next) => {
-    const {data, error} = await supabase.storage.from('Files').download(req.file.url);
+    const {data, error} = await supabase.storage.from('Files').download(req.fileData.url);
 
     const arraybuffer = await data.arrayBuffer();
     const buffer = Buffer.from(arraybuffer);
     const readStream = new Stream.PassThrough();
     readStream.end(buffer);
-    res.set('Content-Disposition', `attachment; filename="${req.file.url}"`);
+    res.set('Content-Disposition', `attachment; filename="${req.fileData.url}"`);
     res.set('Content-Type', 'text-plain');
     readStream.pipe(res);
   }),
