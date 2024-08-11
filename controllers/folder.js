@@ -7,22 +7,6 @@ const renderPage = require('../middleware/render');
 const supabase = require('../config/supabase');
 const formatSize = require('../utils/sizeFormatter');
 
-const renameFolder = async (value, {req}) => {
-  let otherFolders;
-  let newName = value || 'Untitled';
-  try {
-    otherFolders = await prisma.folder.findMany({
-      where: {name: {startsWith: newName}, ownerId: req.session.user.id},
-    });
-  } catch (e) {
-    throw new Error('EXTERNAL_ERROR: Unexpected error while sanitizing name');
-  }
-  if (otherFolders.length > 0) {
-    newName += ` (${otherFolders.length + 1})`;
-  }
-  return newName;
-};
-
 const validateId = () =>
   param('id')
     .isUUID()
@@ -89,7 +73,20 @@ exports.postFolderCreate = [
     .default('')
     .isString()
     .withMessage('Name has to be a string')
-    .customSanitizer(renameFolder)
+    .custom(async (value, {req}) => {
+      let otherFolder;
+      try {
+        otherFolder = await prisma.folder.findFirst({
+          where: {name: value, ownerId: req.session.user.id},
+        });
+      } catch (e) {
+        throw new Error('EXTERNAL_ERROR: Unexpected error while validating name');
+      }
+      if (!!otherFolder) {
+        throw new Error('This name is already in use');
+      }
+      return true;
+    })
     .escape(),
   validate,
   handleAsync(async (req, res, next) => {
@@ -117,7 +114,20 @@ exports.postFolderUpdate = [
     .default('')
     .isString()
     .withMessage('Name has to be a string')
-    .customSanitizer(renameFolder)
+    .custom(async (value, {req}) => {
+      let otherFolder;
+      try {
+        otherFolder = await prisma.folder.findFirst({
+          where: {name: value, ownerId: req.session.user.id, id: {not: req.folder.id}},
+        });
+      } catch (e) {
+        throw new Error('EXTERNAL_ERROR: Unexpected error while validating name');
+      }
+      if (!!otherFolder) {
+        throw new Error('This name is already in use');
+      }
+      return true;
+    })
     .escape(),
   validate,
   handleAsync(async (req, res, next) => {
