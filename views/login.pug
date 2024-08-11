@@ -12,8 +12,8 @@ html
         if serverError
           +errorLabel('An unexpected error happened during the login')
         div(class=`form-card ${serverError ? 'error' : ''}`)
-          h2 Login to continue uploading files
           form(action='/login', method='POST')
+            h2 Login to continue uploading files
             include form_input.pug
             fieldset
               -

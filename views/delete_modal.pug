@@ -1,0 +1,21 @@
+mixin deleteModal({name, action, title, description})
+  link(rel='stylesheet', href='/styles/deletemodal.css')
+  .form-background
+    .form-card-wrapper
+      div(class=`${name} form-card`) 
+        form.delete-form(method='POST', action=action)
+          h2= title
+          p= description
+          .form-actions
+            button.secondary-button.cancel-button(type='button')
+              include ./icons/close.pug
+              +closeIcon("1.5em")
+              span Cancel
+            button.secondary-button.delete-button
+              include ./icons/delete.pug
+              +deleteIcon("1.5em")
+              span Delete
+  script.
+    document.querySelector('.form-card.#{name} .cancel-button').addEventListener('click', () => {
+      document.querySelector('.form-card.#{name}').parentElement.parentElement.style.display = 'none';
+    });

@@ -1,7 +1,7 @@
 extends layout
 block content
   .heading-section
-    if user
+    if user && user.id === folder.ownerId
       h2
         a(href='/') Your space
         |
@@ -34,9 +34,10 @@ block content
           +itemPreview({name: file.name, icon: 'file', redirects: true, url: `${share ? `/share/${share.id}` : ''}/file/${file.id}` })
 
 block append modals
-  if user
+  if user && user.id === folder.ownerId
     include folder_form.pug
     include modal_form.pug
+    include delete_modal.pug
     -
       let folderEditFormArgs = {
         name: 'folder-update-form',
@@ -71,20 +72,30 @@ block append modals
           serverError: folderShareFormError ? folderShareFormError : false,
           values: values ? values.duration : ''
       }
+    -
+      let deleteFolderFormArgs = {
+        name: 'folder-delete-form',
+        action: `/folder/${folder.id}/delete`,
+        title: 'Delete folder',
+        description: 'Are you sure you want to delete this folder? all the files within the folder are going to be deleted'
+      }
     +folderForm(folderEditFormArgs)
     +modalForm(folderShareFormArgs)
+    +deleteModal(deleteFolderFormArgs)
 
 block append styles
   link(rel='stylesheet', href='/styles/folder.css')
 
 block append scripts
   script.
-    if (`#{user}`) {
+    if (`#{user.id}` === `#{folder.ownerId}`) {
       const isFolderEditFormOpen = `#{formOpen}` === 'folder_update';
       const isFolderShareFormOpen = `#{formOpen}` === 'folder_share';
+      const isFolderDeleteFormOpen = `#{formOpen}` === 'folder_delete';
 
       const folderEditForm = document.querySelector('.folder-update-form').parentElement.parentElement;
       const folderShareForm = document.querySelector('.folder-share-form').parentElement.parentElement;
+      const folderDeleteForm = document.querySelector('.folder-delete-form').parentElement.parentElement;
 
       folderEditForm.style.display = isFolderEditFormOpen ? 'block' : 'none';
       folderShareForm.style.display = isFolderShareFormOpen ? 'block' : 'none';
@@ -97,5 +108,9 @@ block append scripts
       document.querySelector('.share-folder-button').addEventListener('click', () => {
         folderShareForm.querySelector('form').reset();
         folderShareForm.style.display = 'block';
+      });
+      document.querySelector('.delete-folder-button').addEventListener('click', () => {
+        folderDeleteForm.querySelector('form').reset();
+        folderDeleteForm.style.display = 'block';
       });
     }

@@ -1,9 +1,9 @@
 extends layout
 block content
   .heading-section
-    if user
+    if user && user.id === file.uploaderId
       h2 #[a(href='/') Your space] / #{file.folder ? file.folder.name : ''}
-    else 
+    else
       h2 Shared folders / #{file.folder ? file.folder.name : ''}
   .file-detail
     include item_preview.pug
@@ -16,7 +16,7 @@ block content
         span.grey #[b Created at:] #{file.createdAt}
         span.grey #[b Last updated at:] #{file.updatedAt}
   .file-actions
-    if user
+    if user && user.id === file.uploaderId
       button.secondary-button.edit-file-button
         include ./icons/edit.pug
         +editIcon("1.5em")
@@ -25,16 +25,16 @@ block content
         include ./icons/delete.pug
         +deleteIcon('1.5em')
         span Delete
-    form(action=`/file/${file.id}/download`, method="POST")
+    form(action=`/file/${file.id}/download`, method='POST')
       if share
-        input(hidden="hidden", type="text", name="shareid", value=share.id)
+        input(hidden='hidden', type='text', name='shareid', value=share.id)
       button.download-file-button.main-button
         include ./icons/download.pug
         +downloadIcon('1.5em')
         span Download
 
 block append modals
-  if user
+  if user && user.id === file.uploaderId
     include file_form.pug
     include delete_modal.pug
     -
