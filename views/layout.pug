@@ -12,12 +12,9 @@ html
       include header.pug
       .content-container
         block content
-    if generalError
-      .general-error-tag
-        span= generalError
-        button
-          include ./icons/close.pug
-          +closeIcon("1em")
+    if mainError
+      include error_toast.pug
+      +errorToast(mainError)
     block modals
       if user
         -
@@ -94,9 +91,3 @@ html
           }),
         );
       }
-
-      const closeErrorTag = document.querySelector('.general-error-tag button');
-      if (closeErrorTag)
-        closeErrorTag.addEventListener('click', () => {
-          document.querySelector('.general-error-tag').parentElement.removeChild(document.querySelector('.general-error-tag'));
-        });

@@ -1,0 +1,13 @@
+mixin errorToast(message)
+  link(rel='stylesheet', href='/styles/errortoast.css')
+  .error-toast
+    span= message
+    button
+      include ./icons/close.pug
+      +closeIcon("1em")
+  script.
+    const closeErrorTag = document.querySelector('.error-toast button');
+    if (closeErrorTag)
+      closeErrorTag.addEventListener('click', () => {
+        document.querySelector('.error-toast').parentElement.removeChild(document.querySelector('.error-toast'));
+      });

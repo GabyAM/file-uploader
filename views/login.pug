@@ -36,3 +36,6 @@ html
               +formInput(passwordArgs)
             button.main-button Send
           span Don't have an account? #[a(href='/signup') Sign up] now
+  if mainError
+    include error_toast.pug
+    +errorToast(mainError)
