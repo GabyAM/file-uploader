@@ -8,57 +8,7 @@ const path = require('path');
 const handleAsync = require('../utils/asyncHandler');
 const validate = require('../middleware/validation');
 const formatSize = require('../utils/sizeFormatter');
-const renderIndex = require('../middleware/render');
-
-const checkFileNameUniqueness = async (value, {req}) => {
-  if (value === '') return true;
-  let otherFile;
-  try {
-    if (req.folder) {
-      otherFile = await prisma.file.findFirst({
-        where: {folderId: req.folder.id, name: value},
-      });
-    } else {
-      const userId = req.session.user.id;
-      otherFile = await prisma.file.findFirst({
-        where: {uploaderId: userId, folderId: null, name: value},
-      });
-    }
-  } catch (e) {
-    throw new Error('EXTERNAL_ERROR: Unexpected error while validating name');
-  }
-  if (otherFile) {
-    throw new Error('A file with that name already exists on the same folder / space');
-  }
-  return true;
-};
-
-const renameFile = async (value, {req}) => {
-  let newName = value || 'Untitled';
-  try {
-    let untitledFiles;
-    if (req.folder) {
-      untitledFiles = await prisma.file.findMany({
-        where: {folderId: req.folder.id, name: {startsWith: newName}},
-      });
-    } else {
-      const userId = req.session.user.id;
-      untitledFiles = await prisma.file.findMany({
-        where: {
-          uploaderId: userId,
-          folderId: null,
-          name: {startsWith: newName},
-        },
-      });
-    }
-    if (untitledFiles.length > 0) {
-      newName += ` (${untitledFiles.length + 1})`;
-    }
-    return newName;
-  } catch (e) {
-    throw new Error('EXTERNAL_ERROR: Unexpected error while sanitizing name');
-  }
-};
+const renderPage = require('../middleware/render');
 
 const formatFileDetails = file => {
   file.size = formatSize(file.size);
@@ -152,13 +102,18 @@ exports.postUploadFile = [
   (req, res, next) =>
     upload.single('file')(req, res, err => {
       if (err) {
-        req.fileValidationError = err;
+        if (err.code === 'LIMIT_FILE_SIZE') {
+          req.fileValidationError = 'The file is too large';
+        } else if (req.file.size === 0) {
+          req.fileValidationError = 'The file cannot be empty';
+        }
+        req.fileValidationError = 'Unexpected error';
       }
       next();
     }),
   body('file').custom(async (value, {req}) => {
     if (req.fileValidationError) {
-      throw new Error('File is too big');
+      throw new Error(req.fileValidationError);
     }
     if (!req.file) {
       throw new Error('File is required');
@@ -177,11 +132,16 @@ exports.postUploadFile = [
     return true;
   }),
   body('folder')
-    .optional({values: 'falsy'})
-    .isUUID()
-    .withMessage('Folder has to be a UUID')
+    .default('')
+    .custom(value => {
+      return (
+        value === '' || /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(value)
+      );
+    })
+    .withMessage('Folder has to be a valid UUID')
     .bail()
     .custom(async (value, {req}) => {
+      if (value === '') return true;
       let folder;
       try {
         folder = await prisma.folder.findUnique({where: {id: value}});
@@ -199,18 +159,33 @@ exports.postUploadFile = [
     .isString()
     .withMessage('Name has to be a string')
     .bail()
-    .customSanitizer(renameFile),
+    .custom(async (value, {req}) => {
+      if (req.folder == null && req.body.folder !== '') return true;
+      let otherFiles;
+      try {
+        otherFiles = await prisma.file.findFirst({
+          where: {name: value, folderId: req.folder?.id || null},
+        });
+      } catch (e) {
+        throw new Error('EXTERNAL_ERROR: unexpected error while validating name');
+      }
+      if (!!otherFiles) {
+        throw new Error('The name is already in use on the folder');
+      }
+      return true;
+    }),
   validate,
   handleAsync(async (req, res, next) => {
     if (req.validationResult) {
       const {internalError, validationErrors} = req.validationResult;
       const props = {
-        fileFormOpen: true,
+        formOpen: 'file_upload',
         fileFormError: internalError,
         fileErrors: validationErrors,
+        values: req.body,
       };
 
-      return renderPage('index', props)(req, res, next);
+      return renderPage('root_folder', props)(req, res, next);
     }
 
     const fileName = `${Date.now()}_${Math.round(Math.random() * 1e9)}${path.extname(req.file.originalname)}`;
