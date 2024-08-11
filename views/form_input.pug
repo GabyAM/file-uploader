@@ -1,12 +1,12 @@
-mixin formInput({type, name, label, value, error})
+mixin formInput({type, name, label, value, error, formName})
   if type === 'password'
     include password_input.pug
     +passwordInput({name, label, value, error})
   else
     div(class=`input-container ${error ? 'error' : ''}`)
       if type === 'file'
-        label.input(for=name)= label
-      input.input(placeholder=label, type=type, name=name, id=name, value=value)
+        label.input(for=`${formName}-${name}`)= label
+      input.input(placeholder=label, type=type, name=name, id=`${formName}-${name}`, value=value)
       if error
         include error_label.pug
         +errorLabel(error)
@@ -14,7 +14,8 @@ mixin formInput({type, name, label, value, error})
     (function () {
       const name = '#{name}';
       const type = '#{type}';
-      const input = document.querySelector(`#${name}`);
+      const formName = '#{formName}';
+      const input = document.querySelector(`#${formName}-${name}`);
       let inputParent = input.parentElement;
       //password inputs have an additional wrapper
       if (type === 'password') inputParent = inputParent.parentElement;
@@ -27,7 +28,6 @@ mixin formInput({type, name, label, value, error})
           inputParent.removeChild(errorLabel);
         }
       });
-
       if (type === 'file') {
         input.addEventListener('change', e => {
           if (e.target.files && e.target.files[0]) {

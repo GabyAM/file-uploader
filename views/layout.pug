@@ -36,7 +36,8 @@ html
             action: '/file/upload',
             title: 'Upload a new file', 
             folders: folders, 
-            errors: fileErrors ? fileErrors : null, 
+            errors: fileErrors ? fileErrors : null,
+            values: values || null,
             serverError: fileFormError ? fileFormError : false
           }
         include file_form.pug

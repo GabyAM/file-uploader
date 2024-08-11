@@ -48,8 +48,8 @@ block append modals
             name: values ? values.name : file.name, 
             folder: values ? values.folder : file.folderId
           },
-        errors: fileErrors ? fileErrors : null, 
-        serverError: fileFormError ? fileFormError : false
+        errors: fileEditErrors ? fileEditErrors : null, 
+        serverError: fileEditFormError ? fileEditFormError : false
       }
     -
       let fileDeleteFormArgs = {
@@ -60,13 +60,13 @@ block append modals
       }
     +fileForm(fileEditFormArgs)
     +deleteModal(fileDeleteFormArgs)
-    
+
 block append styles
   link(rel='stylesheet', href='/styles/file.css')
 
 block append scripts
   script.
-    if (`#{user}`) {
+    if (`#{user.id}` === `#{file.uploaderId}`) {
       const isFileEditFormOpen = `#{formOpen}` === 'file_update';
       const isFileDeleteFormOpen = `#{formOpen}` === 'file_delete';
       const fileEditForm = document.querySelector('.file-update-form').parentElement.parentElement;

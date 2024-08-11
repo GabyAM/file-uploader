@@ -1,4 +1,4 @@
-mixin modalForm({name, action, enctype, title, formInputs, serverError})
+mixin modalForm({name, action, enctype, title, formInputs, errors, values, serverError})
   .form-background
     .form-card-wrapper
       div(class=`${name} form-card`)
@@ -15,10 +15,11 @@ mixin modalForm({name, action, enctype, title, formInputs, serverError})
               -
                 let inputArgs = {
                   ...input, 
-                  error: locals.errors && errors[input.name] ? errors[input.name] : '', 
-                  value: locals.values && values[input.name] ? values[input.name] : '' 
+                  error: errors && errors[input.name] ? errors[input.name] : '', 
+                  value: values && values[input.name] ? values[input.name] : '',
+                  formName: name
                 }
-              if type === "select"
+              if input.type === "select"
                 +formSelect(inputArgs) 
               else
                 +formInput(inputArgs)
@@ -27,6 +28,11 @@ mixin modalForm({name, action, enctype, title, formInputs, serverError})
             include error_label.pug
             +errorLabel(serverError)
   script.
+    document.querySelector('.form-card.#{name} form').addEventListener('submit', e => {
+      e.preventDefault();
+      document.querySelector('.form-card.#{name} form button').disabled = true;
+      document.querySelector('.form-card.#{name} form').submit();
+    });
     document.querySelector('.form-card.#{name} .close-button').addEventListener('click', () => {
       document.querySelector('.form-card.#{name}').parentElement.parentElement.style.display = 'none';
     });

@@ -2,9 +2,9 @@ mixin formSelect({name, label, value, error, options})
   div(class=`input-container ${error ? 'error' : ''}`)
     select.input(name=name, id=name)
       if !value
-        option(disabled, hidden, selected, value='') label
+        option(disabled, hidden, selected, value='')= label
       each option in options
-        option(hidden=option.hidden, selected=value && !label, id=option.id, value=option.id) option.name
+        option(hidden=option.hidden, selected=(value === option.id && !label), id=option.id, value=option.id)= option.name
     if error
       include error_label.pug
       +errorLabel(error)
