@@ -223,6 +223,144 @@ exports.postUploadFile = [
   }),
 ];
 
+exports.postUpdateFile = [
+  authenticate({failureRedirect: '/login'}),
+  handleIdValidation(),
+  (req, res, next) =>
+    upload.single('file')(req, res, err => {
+      if (err) {
+        if (err.code === 'LIMIT_FILE_SIZE') {
+          req.fileValidationError = 'The file is too large';
+        } else if (req.file.size === 0) {
+          req.fileValidationError = 'The file cannot be empty';
+        }
+        req.fileValidationError = 'Unexpected error';
+      }
+      next();
+    }),
+  body('file').custom(async (value, {req}) => {
+    if (!req.file) {
+      return true;
+    }
+    if (req.fileValidationError) {
+      throw new Error(req.fileValidationError);
+    }
+    let user;
+    try {
+      user = await prisma.user.findUnique({
+        where: {id: req.session.user.id},
+      });
+    } catch (e) {
+      throw new Error('EXTERNAL_ERROR: error while validating file');
+    }
+    if (user.usedSpace - req.fileData.size + req.file.size > 50 * 1024 * 1024) {
+      throw new Error('Cannot upload file, there is no enough space');
+    }
+    return true;
+  }),
+  body('folder')
+    .optional()
+    .custom(value => {
+      return (
+        value === '' || /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(value)
+      );
+    })
+    .withMessage('Folder has to be a valid UUID')
+    .bail()
+    .custom(async (value, {req}) => {
+      if (value === '') return true;
+      let folder;
+      try {
+        folder = await prisma.folder.findUnique({where: {id: value}});
+      } catch (e) {
+        throw new Error('EXTERNAL_ERROR: unexpected error while validating folder');
+      }
+      if (!folder) {
+        throw new Error('The folder was not found');
+      }
+      req.folder = folder;
+      return true;
+    }),
+  body('name')
+    .optional()
+    .isString()
+    .withMessage('Name has to be a string')
+    .isLength({min: 1})
+    .withMessage('Name cannot be empty')
+    .isLength({max: 50})
+    .withMessage('Name is too long')
+    .bail()
+    .custom(async (value, {req}) => {
+      if (req.body.folder && !req.folder) return true;
+      let folderId = req.body.folder === '' ? null : req.folder?.id || req.fileData.folderId;
+      let otherFiles;
+      try {
+        otherFiles = await prisma.file.findFirst({
+          where: {name: value, folderId, id: {not: req.fileData.id}},
+        });
+      } catch (e) {
+        throw new Error('EXTERNAL_ERROR: unexpected error while validating name');
+      }
+      if (!!otherFiles) {
+        throw new Error('The name is already in use on the folder');
+      }
+      return true;
+    }),
+  validate,
+  handleAsync(async (req, res, next) => {
+    if (req.validationResult) {
+      const {internalError, validationErrors} = req.validationResult;
+      formatFileDetails(req.fileData);
+      const props = {
+        formOpen: 'file_update',
+        fileEditFormError: internalError,
+        fileEditErrors: validationErrors,
+        file: req.fileData,
+        values: req.body,
+      };
+      return renderPage('file', props)(req, res, next);
+    }
+
+    let update = {};
+    if (req.body.name) update.name = req.body.name;
+    if (req.body.folder != null) update.folderId = req.body.folder || null;
+
+    if (req.file) {
+      const fileBase64 = decode(req.file.buffer.toString('base64'));
+      const {data, error} = await supabase.storage
+        .from('Files')
+        .update(req.fileData.url, fileBase64, {contentType: req.file.mimetype});
+      if (error) next(error);
+
+      update.size = req.file.size;
+      update.type = req.file.mimetype;
+
+      await prisma.$transaction([
+        prisma.file.update({
+          where: {id: req.params.id},
+          data: update,
+        }),
+        prisma.user.update({
+          where: {id: req.session.user.id},
+          data: {
+            usedSpace: {increment: req.fileData.size - req.file.size},
+          },
+        }),
+      ]);
+
+      req.session.user.usedSpace += req.file.size - req.fileData.size;
+      req.session.user.usedSpaceFormatted = formatSize(req.session.user.usedSpace);
+    } else {
+      await prisma.file.update({
+        where: {id: req.params.id},
+        data: update,
+      });
+    }
+
+    res.redirect(`/file/${req.params.id}`);
+  }),
+];
+
 exports.postDeleteFile = [
   authenticate({failureRedirect: 'login'}),
   handleIdValidation(),

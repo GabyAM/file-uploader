@@ -6,4 +6,6 @@ router.get('/:id', fileController.getFilePage);
 
 router.post('/upload', fileController.postUploadFile);
 
+router.post('/:id/update', fileController.postUpdateFile);
+
 module.exports = router;
