@@ -5,6 +5,7 @@ const handleAsync = require('../utils/asyncHandler');
 const util = require('util');
 const validate = require('../middleware/validation');
 const formatSize = require('../utils/sizeFormatter');
+const bcrypt = require('bcryptjs');
 
 exports.getLoginPage = [
   authenticate({successRedirect: '/'}),
@@ -58,8 +59,16 @@ exports.postLogin = [
     .trim()
     .isLength({min: 8})
     .withMessage('Password has to have at least 8 characters')
-    .custom((value, {req}) => {
-      if (req.user && req.user.password !== value) {
+    .bail()
+    .custom(async (value, {req}) => {
+      if (!req.user) return true;
+      let match;
+      try {
+        match = await bcrypt.compare(value, req.user.password);
+      } catch (e) {
+        throw new Error('EXTERNAL_ERROR: Unexpected error while comparing password');
+      }
+      if (!match) {
         throw new Error('Password is incorrect');
       }
       return true;
@@ -123,14 +132,6 @@ exports.postSignup = [
       req.user = user;
     })
     .escape(),
-  body('password')
-    .exists()
-    .withMessage('Password is required')
-    .isString()
-    .withMessage('Password has to be a string')
-    .trim()
-    .isLength({min: 8})
-    .withMessage('Password has to have at least 8 characters'),
   body('passwordConfirm')
     .exists()
     .withMessage('Password confirm is required')
@@ -143,6 +144,25 @@ exports.postSignup = [
       }
       return true;
     }),
+  body('password')
+    .exists()
+    .withMessage('Password is required')
+    .isString()
+    .withMessage('Password has to be a string')
+    .trim()
+    .isLength({min: 8})
+    .withMessage('Password has to have at least 8 characters')
+    .bail()
+    .customSanitizer(async (value, {req}) => {
+      if (req.body.passwordConfirm !== value) return value;
+      let hashedPassword;
+      try {
+        hashedPassword = await bcrypt.hash(value, 10);
+      } catch (e) {
+        throw new Error('EXTERNAL_ERROR: Unexpected error while hashing password');
+      }
+      return hashedPassword;
+    }),
   validate,
   handleAsync(async (req, res, next) => {
     if (req.validationResult) {
@@ -150,7 +170,9 @@ exports.postSignup = [
       const errorProps = {serverError: internalError, errors: validationErrors};
       return res.render('signup.pug', {values: req.body, ...errorProps});
     }
+
     const {name, email, password} = req.body;
+
     await prisma.user.create({data: {name, email, password}});
     res.redirect('/login');
   }),
