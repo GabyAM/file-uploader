@@ -94,7 +94,7 @@ exports.getSharedFilePage = [
     req.fileData.folder = folder;
     formatFileDetails(req.fileData);
 
-    res.render('file', {file: req.fileData, share: req.share});
+    return renderPage('file', {file: req.fileData, share: req.share})(req, res, next);
   }),
 ];
 
