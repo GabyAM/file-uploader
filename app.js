@@ -21,7 +21,7 @@ app.set('view engine', 'pug');
 
 app.use(
   session({
-    secret: 'sessionsecretchangelater',
+    secret: process.env.SESSION_SECRET,
     resave: true,
     saveUninitialized: true,
     cookie: {maxAge: 7 * 24 * 60 * 60 * 1000},
