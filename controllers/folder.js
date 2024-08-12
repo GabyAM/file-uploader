@@ -39,7 +39,10 @@ exports.getFolderPage = [
   authenticate({failureRedirect: '/'}),
   handleIdValidation(),
   handleAsync(async (req, res, next) => {
-    const files = await prisma.file.findMany({where: {folderId: req.params.id}});
+    const files = await prisma.file.findMany({
+      where: {folderId: req.params.id},
+      orderBy: [{name: 'asc'}],
+    });
     return renderPage('folder', {folder: req.folder, files})(req, res, next);
   }),
 ];
@@ -61,6 +64,7 @@ exports.getSharedFolderPage = [
     const props = {
       folder: await prisma.folder.findFirst({where: {id: share.folderId}}),
       files: await prisma.file.findMany({where: {folderId: share.folderId}}),
+      orderBy: [{name: 'asc'}],
       share,
     };
     return renderPage('folder', props)(req, res, next);
