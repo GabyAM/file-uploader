@@ -1,0 +1,14 @@
+.form-background .delete-form {
+  gap: 2em;
+}
+
+.delete-form .form-actions {
+  display: flex;
+  gap: 1em;
+  align-items: center;
+  margin: 0 auto;
+}
+
+.delete-form .form-actions .delete-button {
+  border: 2px solid #ff5b5b;
+}
