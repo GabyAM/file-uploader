@@ -10,10 +10,11 @@ header
         span= user.email
       else
         h3 Guest user
-    button.logout-button.main-button
-      include ./icons/logout.pug
-      +logoutIcon('1.5em')
-      span Log out
+    form(method='POST', action='/logout')
+      button.logout-button.main-button
+        include ./icons/logout.pug
+        +logoutIcon('1.5em')
+        span Log out
 
   .lower-section
     .actions-section

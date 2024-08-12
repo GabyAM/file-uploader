@@ -2,3 +2,43 @@ body {
   display: flex;
   flex-direction: row;
 }
+
+main {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: fit-content;
+}
+
+main > * {
+  padding: 1.2rem 2rem;
+  max-width: 2000px;
+  width: 100%;
+  margin: 0 auto;
+}
+main .content-container > *:not(.heading-section) {
+  padding: 2rem;
+}
+
+.expand-button {
+  background: none;
+  border: none;
+  width: 2em;
+  height: 2em;
+  display: none;
+  color: white;
+  flex-shrink: 0;
+}
+
+.actions-section {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5em;
+  margin: 0 auto;
+  width: 100%;
+}
+.actions-section > * {
+  flex: 1;
+}

@@ -15,6 +15,7 @@ nav {
   scrollbar-color: #1c1c25 rgba(198, 197, 243, 0.09);
   scrollbar-width: thin;
   transition: transform 0.5s ease;
+  padding-bottom: 4em;
 }
 nav.visible {
   transform: translateX(0);
@@ -43,6 +44,7 @@ nav section h2 {
   padding: 0 1.2em;
   font-size: 1.25em;
 }
+
 nav .items-section .items-list {
   list-style: none;
 }
@@ -71,14 +73,35 @@ nav .storage-section {
   padding-bottom: 3em;
 }
 nav .storage-bar-container {
-  padding: 0 2.25em;
   display: flex;
   flex-direction: column;
   gap: 0.25em;
 }
+nav section p,
+nav .storage-bar-container {
+  padding: 0 2.25em;
+}
+
 nav .storage-space-bar {
   height: 0.5rem;
   border-radius: 100vh;
+}
+
+nav .account-section {
+  display: none;
+  gap: 0.5em;
+}
+nav .account-section > div {
+  display: flex;
+  flex-direction: column;
+  padding: 0 2.25em;
+  gap: 1em;
+}
+nav .account-section span {
+  display: block;
+}
+nav .account-section span:nth-of-type(2) {
+  color: #c6c6c6;
 }
 
 @media (max-width: 800px) {
@@ -99,5 +122,8 @@ nav .storage-space-bar {
 @media (max-width: 475px) {
   nav .actions-section {
     display: none;
+  }
+  nav .account-section {
+    display: flex;
   }
 }

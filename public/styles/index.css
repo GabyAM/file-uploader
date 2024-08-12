@@ -77,7 +77,32 @@ a {
   font-weight: 700;
   width: fit-content;
   height: fit-content;
-  padding: 0.4em 0.625em;
-  font-size: 1.125em;
+  padding: 0.8em 1em;
+  display: flex;
+  gap: 0.5em;
+  align-items: center;
 }
+
+.secondary-button {
+  background-color: rgba(198, 197, 243, 0.09);
+  padding: 0.8em 1em;
+  border: none;
+  color: white;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5em;
+  border-radius: 0.5em;
+  white-space: nowrap;
+  justify-content: center;
+}
+.secondary-button svg {
+  color: #e4e3ff;
+  object-fit: contain;
+}
+.bare-button {
+  background: none;
+  border: none;
+  color: #a09eff;
+  font-size: 1em;
 }

@@ -42,12 +42,22 @@ nav
         if user && user.usedSpaceFormatted
           span #{user.usedSpaceFormatted} of 50MB used
           .storage-space-bar
+    section.account-section 
+      h2 Account
+      div 
+        div
+          span= user.name 
+          span.grey= user.email
+        form(method='POST', action='/logout')
+          button.logout-button.main-button
+            include ./icons/logout.pug
+            +logoutIcon('1.5em')
+            span Log out
 
 script.
   const storageBar = document.querySelector('.storage-space-bar');
-
   if (`#{user}`) {
-    const user = `#{user}`;
+    const user = JSON.parse(`!{JSON.stringify(user)}`);
     const usedPercentage = (Number(user?.usedSpace || 0) * 100) / 52428800;
     storageBar.style.background = `linear-gradient(to right, #A09EFF ${usedPercentage}%, #1C1C25 ${usedPercentage}%)`;
   }

@@ -1,0 +1,58 @@
+header {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2em;
+
+  white-space: nowrap;
+}
+
+header .upper-section {
+  display: flex;
+  align-items: center;
+  gap: 1.5em;
+}
+
+header .user-info {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+header .user-info > * {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+header form {
+  margin-right: 0;
+  margin-left: auto;
+}
+header .logout-button {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.3em;
+}
+
+header .lower-section,
+header .actions-section {
+  display: none;
+}
+
+@media (max-width: 800px) {
+  header .expand-button {
+    display: block;
+  }
+}
+@media (max-width: 475px) {
+  header {
+    background-color: #262632;
+  }
+
+  header .lower-section,
+  header .actions-section {
+    display: flex;
+  }
+  header .logout-button {
+    display: none;
+  }
+}
