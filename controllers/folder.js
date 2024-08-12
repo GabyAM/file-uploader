@@ -70,9 +70,14 @@ exports.getSharedFolderPage = [
 exports.postFolderCreate = [
   authenticate({failureRedirect: '/login'}),
   body('name')
-    .default('')
     .isString()
     .withMessage('Name has to be a string')
+    .trim()
+    .isLength({min: 1})
+    .withMessage('Name cannot be empty')
+    .isLength({max: 50})
+    .withMessage('Name is too long')
+    .bail()
     .custom(async (value, {req}) => {
       let otherFolder;
       try {
@@ -111,9 +116,14 @@ exports.postFolderUpdate = [
   authenticate({failureRedirect: '/login'}),
   handleIdValidation(),
   body('name')
-    .default('')
     .isString()
     .withMessage('Name has to be a string')
+    .trim()
+    .isLength({min: 1})
+    .withMessage('Name cannot be empty')
+    .isLength({max: 50})
+    .withMessage('Name is too long')
+    .bail()
     .custom(async (value, {req}) => {
       let otherFolder;
       try {

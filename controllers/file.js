@@ -155,9 +155,13 @@ exports.postUploadFile = [
       return true;
     }),
   body('name')
-    .default('')
     .isString()
     .withMessage('Name has to be a string')
+    .trim()
+    .isLength({min: 1})
+    .withMessage('Name cannot be empty')
+    .isLength({max: 50})
+    .withMessage('Name is too long')
     .bail()
     .custom(async (value, {req}) => {
       if (req.folder == null && req.body.folder !== '') return true;
