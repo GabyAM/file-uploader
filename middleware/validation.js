@@ -5,7 +5,7 @@ const validate = (req, res, next) => {
   if (!errors.isEmpty()) {
     errors = errors.mapped();
     const validationResult = {
-      internalError: Object.values(errors).some(err => err.isExternalError),
+      internalError: Object.values(errors).some(err => err.startsWith('EXTERNAL_ERROR:')),
     };
     if (!validationResult.internalError) {
       validationResult.validationErrors = errors;

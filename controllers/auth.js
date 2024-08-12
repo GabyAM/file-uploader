@@ -21,7 +21,7 @@ exports.getLoginPage = [
 exports.getSignupPage = [
   authenticate({successRedirect: '/'}),
   (req, res, next) => {
-    res.render('signup.ejs');
+    res.render('signup.pug');
   },
 ];
 
@@ -40,7 +40,7 @@ exports.postLogin = [
     .custom(async (value, {req}) => {
       let user;
       try {
-        user = await prisma.user.findUniqueOrThrow({where: {email: value}});
+        user = await prisma.user.findUnique({where: {email: value}});
       } catch (e) {
         throw new Error('EXTERNAL_ERROR: Error while validating email');
       }
@@ -59,7 +59,7 @@ exports.postLogin = [
     .isLength({min: 8})
     .withMessage('Password has to have at least 8 characters')
     .custom((value, {req}) => {
-      if (req.user.password !== value) {
+      if (req.user && req.user.password !== value) {
         throw new Error('Password is incorrect');
       }
       return true;
@@ -68,8 +68,11 @@ exports.postLogin = [
   handleAsync(async (req, res, next) => {
     if (req.validationResult) {
       const {internalError, validationErrors} = req.validationResult;
-      const errorProps = {serverError: internalError, errors: validationErrors};
-      return res.render('login.ejs', {values: req.body, ...errorProps});
+      const errorProps = {
+        serverError: internalError,
+        errors: validationErrors,
+      };
+      return res.render('login.pug', {values: req.body, ...errorProps});
     }
     const regenerateSession = util.promisify(req.session.regenerate).bind(req.session);
     const saveSession = util.promisify(req.session.save).bind(req.session);
@@ -144,8 +147,8 @@ exports.postSignup = [
   handleAsync(async (req, res, next) => {
     if (req.validationResult) {
       const {internalError, validationErrors} = req.validationResult;
-      const errorProps = {serverError: internalError, erros: validationErrors};
-      return res.render('signup.ejs', {values: req.body, ...errorProps});
+      const errorProps = {serverError: internalError, errors: validationErrors};
+      return res.render('signup.pug', {values: req.body, ...errorProps});
     }
     const {name, email, password} = req.body;
     await prisma.user.create({data: {name, email, password}});

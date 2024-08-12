@@ -9,6 +9,7 @@ const handleAsync = require('../utils/asyncHandler');
 const validate = require('../middleware/validation');
 const formatSize = require('../utils/sizeFormatter');
 const renderPage = require('../middleware/render');
+const {Stream} = require('stream');
 
 const formatFileDetails = file => {
   file.size = formatSize(file.size);
@@ -368,12 +369,12 @@ exports.postDeleteFile = [
     await prisma.$transaction([
       prisma.user.update({
         where: {id: req.session.user.id},
-        data: {usedSpace: {decrement: req.file.size}},
+        data: {usedSpace: {decrement: req.fileData.size}},
       }),
-      prisma.file.delete({where: {id: req.file.id}}),
+      prisma.file.delete({where: {id: req.fileData.id}}),
     ]);
 
-    req.session.user.usedSpace -= req.file.size;
+    req.session.user.usedSpace -= req.fileData.size;
     req.session.user.usedSpaceFormatted = formatSize(req.session.user.usedSpace);
 
     res.redirect(req.fileData.folderId ? `/folder/${req.fileData.folderId}` : '/');
@@ -413,4 +414,3 @@ exports.postDownloadFile = [
     readStream.pipe(res);
   }),
 ];
-

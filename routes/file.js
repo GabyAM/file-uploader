@@ -8,4 +8,8 @@ router.post('/upload', fileController.postUploadFile);
 
 router.post('/:id/update', fileController.postUpdateFile);
 
+router.post('/:id/delete', fileController.postDeleteFile);
+
+router.post('/:fileid/download', fileController.postDownloadFile);
+
 module.exports = router;

@@ -12,6 +12,7 @@ function formatSize(bytes) {
       return formatted;
     }
   }
+  return '0 bytes';
 }
 
 module.exports = formatSize;
