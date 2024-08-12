@@ -152,3 +152,14 @@ exports.postSignup = [
     res.redirect('/login');
   }),
 ];
+
+exports.postLogout = [
+  authenticate({failureRedirect: '/login'}),
+  handleAsync(async (req, res, next) => {
+    const saveSession = util.promisify(req.session.save).bind(req.session);
+    req.session.user = null;
+
+    await saveSession();
+    res.redirect('/login');
+  }),
+];
