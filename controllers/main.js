@@ -10,6 +10,11 @@ exports.getHomePage = [
       props.mainError = req.session.error;
       delete req.session.error;
     }
-    return renderPage('root_folder', props)(req, res, next);
+    renderPage('root_folder', props)(req, res, next);
   }),
+  (err, req, res, next) => {
+    if (err) {
+      res.render('error.pug');
+    }
+  },
 ];

@@ -106,3 +106,14 @@ a {
   color: #a09eff;
   font-size: 1em;
 }
+
+.error-page {
+  padding: 1.5em 1em;
+  font-weight: 700;
+}
+.error-page p {
+  margin-bottom: 2em;
+}
+.error-page a {
+  color: #a09eff;
+}
