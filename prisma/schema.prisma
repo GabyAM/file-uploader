@@ -34,7 +34,7 @@ model File {
   uploaderId String @db.Uuid
   folder Folder? @relation(fields: [folderId], references: [id], onDelete: Cascade)
   folderId String? @db.Uuid
-  @@unique([name, folderId])
+  @@unique([name, folderId, uploaderId])
 }
 
 model Folder {
@@ -46,6 +46,7 @@ model Folder {
   ownerId String @db.Uuid
   files File[]
   shares Share[]
+  @@unique([name, ownerId])
 }
 
 model Share {
