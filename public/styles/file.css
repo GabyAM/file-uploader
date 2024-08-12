@@ -3,6 +3,7 @@
   flex-direction: row;
   gap: 3em;
   padding: 2rem;
+  flex-wrap: wrap;
 }
 .file-detail .item {
   width: 150px;
@@ -24,4 +25,11 @@
 }
 .file-info-details span.grey > * {
   color: white;
+}
+
+.file-actions {
+  display: flex;
+  gap: 0.5em;
+  align-items: center;
+  flex-wrap: wrap;
 }

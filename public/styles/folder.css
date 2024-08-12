@@ -1,6 +1,44 @@
+.heading-section {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1em;
+}
+.heading-section div {
+  display: flex;
+  gap: 0.5em;
+}
+
+.no-content-message * {
+  display: inline;
+}
+
+.folder-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5em;
+}
+
+.share-message {
+  background-color: rgba(198, 197, 243, 0.09);
+  padding: 0.25 0.8em;
+  border-radius: 0.5em;
+  width: fit-content;
+}
+.share-message a {
+  color: #a09eff;
+}
 .folder-files {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 4rem;
-  padding: 2rem;
+}
+
+@media (max-width: 475px) {
+  .folder-files {
+    grid-template-columns: repeat(auto-fill, minmax(75px, 1fr));
+  }
+  .folder-files .icon {
+    padding: 1em;
+  }
 }
