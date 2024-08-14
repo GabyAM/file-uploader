@@ -4,7 +4,9 @@ App for uploading, managing, and sharing files.
 
 
 ## Introduction
-This is a small project which purpose is to obtain experience and get comfortable with new backend technologies, such as PostgreSQL and Prisma. I was also able to refresh some concepts that i hadn't gone back to in some time, like templating engines.
+This is a small project which purpose is to obtain experience and get comfortable with new backend technologies, such as PostgreSQL and Prisma. I was also able to refresh some concepts that i hadn't gone back to in some time, like templating engines. \
+It was also built as a part of The Odin Project Node js currriculum's \
+Check out the [Live preview](https://odin-file-uploader.onrender.com/)
 
 <img width="947" alt="image" src="https://github.com/user-attachments/assets/771e9d8e-e7ae-4c81-a518-9f0bb2529f16">
 
@@ -48,9 +50,12 @@ SUPABASE_API_URL="your_supabase_api_url"
 SUPABASE_API_KEY="your_supabase_api_key"
 SESSION_SECRET="something_secret_goes_here"
 ```
-5. Start the project in dev mode
+5. Populate the database with the prisma schema
+```
+npx prisma db push
+```
+6. Start the project in dev mode
 ```
 npm start
 ```
 The server will be started by default in the port 3000 of your machine. If you are already using that port, you can set the "PORT" variable in the .env file and restart it.
-
