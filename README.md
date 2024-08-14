@@ -26,7 +26,8 @@ Node, Express, PostgreSQL, Supabase, Prisma, Pug
 
 #### Pre-requisites
 
-A supabase database is required to store and download files, you can create one for free at https://supabase.com/ 
+This project requires a PostgreSQL database for storing records and a supabase database for storing and downloading files. You can learn how to install PostgreSQL and create a database from [It's documentation](https://www.postgresql.org/docs/current/tutorial-install.html) or you could either host one in a PaaS like [Neon](https://neon.tech/) \
+For the supabase DB, you can create one for free at https://supabase.com/ 
 
 #### Running locally
 
@@ -39,3 +40,17 @@ git clone https://github.com/GabyAM/odin-file-uploader
 ```
 npm install
 ```
+3. Create a file named .env in the root folder
+4. Insert your secret data in the .env file, this is the url for your PostgreSQL database, your supabase api url and key, and a session secret, that can be whatever you want.
+```
+DATABASE_URL="postgresql://username:password@localhost:5432/db_name?schema=public"
+SUPABASE_API_URL="your_supabase_api_url"
+SUPABASE_API_KEY="your_supabase_api_key"
+SESSION_SECRET="something_secret_goes_here"
+```
+5. Start the project in dev mode
+```
+npm start
+```
+The server will be started by default in the port 3000 of your machine. If you are already using that port, you can set the "PORT" variable in the .env file and restart it.
+
